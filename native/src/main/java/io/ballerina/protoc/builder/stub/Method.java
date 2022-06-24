@@ -28,7 +28,7 @@ import static io.ballerina.protoc.builder.balgen.BalGenerationUtils.getMappingBa
 /**
  * Method definition bean class.
  *
- * @since 0.982.0
+ * @since 0.1.0
  */
 public class Method {
     private final String methodName;

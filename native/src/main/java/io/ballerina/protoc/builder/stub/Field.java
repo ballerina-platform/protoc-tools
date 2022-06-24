@@ -31,7 +31,7 @@ import static io.ballerina.protoc.builder.stub.utils.StubUtils.RESERVED_LITERAL_
 /**
  * Field definition bean class.
  *
- * @since 0.982.0
+ * @since 0.1.0
  */
 public class Field {
     private final String fieldType;

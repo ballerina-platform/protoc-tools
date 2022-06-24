@@ -27,7 +27,7 @@ import static io.ballerina.protoc.builder.stub.utils.StubUtils.RESERVED_LITERAL_
 /**
  * Enum Field definition.
  *
- * @since 0.982.0
+ * @since 0.1.0
  */
 public class EnumField {
     private final String name;

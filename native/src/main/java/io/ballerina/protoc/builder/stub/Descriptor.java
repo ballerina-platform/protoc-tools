@@ -28,7 +28,7 @@ import static io.ballerina.protoc.builder.balgen.BalGenerationUtils.bytesToHex;
 /**
  * Service descriptor definition.
  *
- * @since 0.982.0
+ * @since 0.1.0
  */
 public class Descriptor {
     private final String descriptorKey;

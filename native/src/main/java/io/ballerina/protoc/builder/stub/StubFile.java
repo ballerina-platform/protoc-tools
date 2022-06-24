@@ -23,7 +23,7 @@ import java.util.List;
 /**
  * Client Stub File definition bean class.
  *
- * @since 0.982.0
+ * @since 0.1.0
  */
 public class StubFile extends AbstractStub {
     private final List<ServiceStub> stubList = new ArrayList<>();

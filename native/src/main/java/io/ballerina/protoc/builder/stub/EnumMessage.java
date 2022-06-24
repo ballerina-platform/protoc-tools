@@ -27,7 +27,7 @@ import static io.ballerina.protoc.builder.BallerinaFileBuilder.enumDefaultValueM
 /**
  * Enum Message Definition.
  *
- * @since 0.982.0
+ * @since 0.1.0
  */
 public class EnumMessage {
     private final List<EnumField> fieldList;
