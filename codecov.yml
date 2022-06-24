@@ -1,0 +1,25 @@
+fixes:
+  - "ballerina/grpc/*/::../ballerina/"
+  - "ballerina/modules/types.duration/*::../ballerina/"
+  - "ballerina/modules/types.struct/*::../ballerina/"
+  - "ballerina/modules/types.timestamp/*::../ballerina/"
+  - "ballerina/modules/types.wrappers/*::../ballerina/"
+
+ignore:
+  - "grpc-test-utils"
+  - "ballerina-tests"
+  - "compiler-plugin-tests"
+  - "test-utils"
+  - "examples"
+  - "integration-tests"
+  - "load-tests"
+  - "tooling-tests"
+
+coverage:
+  precision: 2
+  round: down
+  range: "60...80"
+  status:
+    project:
+      default:
+        target: 80

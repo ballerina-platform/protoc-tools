@@ -1,0 +1,13 @@
+[package]
+org = "ballerina"
+name = "protoc"
+version = "@toml.version@"
+authors = ["Ballerina"]
+keywords = ["wrappers"]
+repository = "https://github.com/ballerina-platform/protoc-tools"
+license = ["Apache-2.0"]
+distribution = "2201.0.4"
+export = ["protoc"]
+
+[[platform.java11.dependency]]
+path = "../native/build/libs/protoc-tools-native-@project.version@.jar"
