@@ -23,7 +23,7 @@ package io.ballerina.protoc;
  * Referenced from grpc-java implementation.
  * <p>
  *
- * @since 0.980.0
+ * @since 0.1.0
  */
 public final class MethodDescriptor {
 
