@@ -1,4 +1,4 @@
-Ballerina gRPC Library
+Ballerina Protoc-Tools
 ===================
 
   [![Build](https://github.com/ballerina-platform/protoc-tools/actions/workflows/build-timestamped-master.yml/badge.svg)](https://github.com/ballerina-platform/protoc-tools/actions/workflows/build-timestamped-master.yml)
