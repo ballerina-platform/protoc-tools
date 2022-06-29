@@ -56,6 +56,7 @@ import static io.ballerina.protoc.builder.balgen.BalGenConstants.GRPC_PROXY;
  */
 @CommandLine.Command(
         name = "grpc",
+        aliases = "protoc",
         description = "generate Ballerina gRPC client stub for gRPC service for a given gRPC protoc " +
                 "definition.")
 public class GrpcCmd implements BLauncherCmd {
