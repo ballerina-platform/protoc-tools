@@ -184,7 +184,7 @@ public class ToolingTestUtils {
             protocOutputDirPath = Paths.get(GENERATED_SOURCES_DIRECTORY, outputDir);
         }
         try {
-            Class<?> grpcCmdClass = Class.forName("io.ballerina.stdlib.grpc.protobuf.cmd.GrpcCmd");
+            Class<?> grpcCmdClass = Class.forName("io.ballerina.protoc.protobuf.cmd.GrpcCmd");
             GrpcCmd grpcCmd = (GrpcCmd) grpcCmdClass.getDeclaredConstructor().newInstance();
             grpcCmd.setProtoPath(RESOURCE_DIRECTORY.toString() + FILE_SEPARATOR + PROTO_FILE_DIRECTORY + subDir);
             grpcCmd.setBalOutPath(protocOutputDirPath.toAbsolutePath().toString());
@@ -215,7 +215,7 @@ public class ToolingTestUtils {
     public static void generateSourceCode(Path sProtoFilePath, Path sOutputDirPath, String mode, Path sImportDirPath) {
         Class<?> grpcCmdClass;
         try {
-            grpcCmdClass = Class.forName("io.ballerina.stdlib.grpc.protobuf.cmd.GrpcCmd");
+            grpcCmdClass = Class.forName("io.ballerina.protoc.protobuf.cmd.GrpcCmd");
             GrpcCmd grpcCmd = (GrpcCmd) grpcCmdClass.getDeclaredConstructor().newInstance();
             grpcCmd.setProtoPath(sProtoFilePath.toAbsolutePath().toString());
             if (!sOutputDirPath.toString().isBlank()) {
