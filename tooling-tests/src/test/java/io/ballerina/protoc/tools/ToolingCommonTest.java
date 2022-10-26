@@ -21,6 +21,7 @@ package io.ballerina.protoc.tools;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -33,6 +34,7 @@ import static io.ballerina.protoc.tools.ToolingTestUtils.RESOURCE_DIRECTORY;
 import static io.ballerina.protoc.tools.ToolingTestUtils.assertGeneratedDataTypeSources;
 import static io.ballerina.protoc.tools.ToolingTestUtils.assertGeneratedDataTypeSourcesNegative;
 import static io.ballerina.protoc.tools.ToolingTestUtils.assertGeneratedSources;
+import static io.ballerina.protoc.tools.ToolingTestUtils.assertGeneratedSourcesWithNestedDirectories;
 import static io.ballerina.protoc.tools.ToolingTestUtils.copyBallerinaToml;
 import static io.ballerina.protoc.tools.ToolingTestUtils.generateSourceCode;
 import static io.ballerina.protoc.tools.ToolingTestUtils.hasSemanticDiagnostics;
@@ -200,6 +202,80 @@ public class ToolingCommonTest {
     }
 
     @Test
+    public void testServiceWithNestedMessage() {
+        assertGeneratedSources("data-types", "service_with_nested_messages.proto",
+                "service_with_nested_messages_pb.bal", "servicewithnestedmessage_service.bal",
+                "servicewithnestedmessage_client.bal", "tool_test_data_type_25");
+    }
+
+    @Test
+    public void testBasicNestedDirectories() {
+        assertGeneratedSourcesWithNestedDirectories("nested/basic/**.proto",
+                "tool_test_nested_directories_01", null);
+        Path expectedPath = Paths.get(RESOURCE_DIRECTORY.toString(), BAL_FILE_DIRECTORY,
+                "tool_test_nested_directories_01");
+        Path actualPath = Paths.get(GENERATED_SOURCES_DIRECTORY, "tool_test_nested_directories_01");
+        Assert.assertEquals(readContent(expectedPath.resolve("service_pb.bal")),
+                readContent(actualPath.resolve("service_pb.bal")));
+        Assert.assertEquals(readContent(expectedPath.resolve("messages_pb.bal")),
+                readContent(actualPath.resolve("messages_pb.bal")));
+    }
+
+    @Test
+    public void testNestedDirectoryWithImportPath() {
+        assertGeneratedSourcesWithNestedDirectories("nested/import_path/**.proto",
+                "tool_test_nested_directories_02", "nested/import_path/");
+        Path expectedPath = Paths.get(RESOURCE_DIRECTORY.toString(), BAL_FILE_DIRECTORY,
+                "tool_test_nested_directories_02");
+        Path actualPath = Paths.get(GENERATED_SOURCES_DIRECTORY, "tool_test_nested_directories_02");
+        Assert.assertEquals(readContent(expectedPath.resolve("service_pb.bal")),
+                readContent(actualPath.resolve("service_pb.bal")));
+        Assert.assertEquals(readContent(expectedPath.resolve("messages1_pb.bal")),
+                readContent(actualPath.resolve("messages1_pb.bal")));
+        Assert.assertEquals(readContent(expectedPath.resolve("messages2_pb.bal")),
+                readContent(actualPath.resolve("messages2_pb.bal")));
+    }
+
+    @Test
+    public void testNestedDirectoryWithMultipleServices() {
+        assertGeneratedSourcesWithNestedDirectories("nested/multiple_service/**.proto",
+                "tool_test_nested_directories_03", "nested/multiple_service");
+        Path expectedPath = Paths.get(RESOURCE_DIRECTORY.toString(), BAL_FILE_DIRECTORY,
+                "tool_test_nested_directories_03");
+        Path actualPath = Paths.get(GENERATED_SOURCES_DIRECTORY, "tool_test_nested_directories_03");
+        Assert.assertEquals(readContent(expectedPath.resolve("service1_pb.bal")),
+                readContent(actualPath.resolve("service1_pb.bal")));
+        Assert.assertEquals(readContent(expectedPath.resolve("service2_pb.bal")),
+                readContent(actualPath.resolve("service2_pb.bal")));
+        Assert.assertEquals(readContent(expectedPath.resolve("messages1_pb.bal")),
+                readContent(actualPath.resolve("messages1_pb.bal")));
+        Assert.assertEquals(readContent(expectedPath.resolve("messages2_pb.bal")),
+                readContent(actualPath.resolve("messages2_pb.bal")));
+    }
+
+    @Test(enabled = true)
+    public void testNestedDirectoryWithPackageOption() {
+        try {
+            Files.createDirectories(Paths.get(GENERATED_SOURCES_DIRECTORY, "tool_test_packaging_nested_dirs"));
+        } catch (IOException e) {
+            Assert.fail("Could not create target directories", e);
+        }
+        assertGeneratedSourcesWithNestedDirectories("nested/package/**.proto", "tool_test_packaging_nested_dirs",
+                "nested/package/");
+        Path expectedPath = Paths.get(RESOURCE_DIRECTORY.toString(), BAL_FILE_DIRECTORY,
+                "tool_test_packaging_nested_dirs");
+        Path actualPath = Paths.get(GENERATED_SOURCES_DIRECTORY, "tool_test_packaging_nested_dirs");
+        Assert.assertEquals(readContent(expectedPath.resolve("service1_pb.bal")),
+                readContent(actualPath.resolve("service1_pb.bal")));
+        Assert.assertEquals(readContent(expectedPath.resolve("service2_pb.bal")),
+                readContent(actualPath.resolve("service2_pb.bal")));
+        Assert.assertEquals(readContent(expectedPath.resolve("messages1_pb.bal")),
+                readContent(actualPath.resolve("modules/messages/messages1_pb.bal")));
+        Assert.assertEquals(readContent(expectedPath.resolve("messages2_pb.bal")),
+                readContent(actualPath.resolve("modules/messages/messages2_pb.bal")));
+    }
+
+    @Test
     public void testProtoDirectory() {
         Path protoFilePath = Paths.get(RESOURCE_DIRECTORY.toString(), PROTO_FILE_DIRECTORY, "proto-dir");
         Path outputDirPath = Paths.get(GENERATED_SOURCES_DIRECTORY, "tool_test_proto_dir");
@@ -270,15 +346,15 @@ public class ToolingCommonTest {
             "We can use this to verify the generated output files manually.")
     public void generateStubFilesForBallerinaTests() {
         Path outputDirPath = Paths.get("../ballerina-tests/tests/");
-        // First stub file should not be regenerated since it was generated by an older tool version
+        // 1st, 3rd, 4th, 6th, 54th stub files should not be regenerated since it was generated by an older tool version
         // (To ensure backwards compatibility).
 //        generateSourceCode(outputDirPath.resolve("01_advanced_type_service.proto"), outputDirPath, null, null);
         generateSourceCode(outputDirPath.resolve("02_array_field_type_service.proto"), outputDirPath, null, null);
-        generateSourceCode(outputDirPath.resolve("03_bidirectional_streaming_service.proto"), outputDirPath,
-                null, null);
-        generateSourceCode(outputDirPath.resolve("04_client_streaming_service.proto"), outputDirPath, null, null);
+//        generateSourceCode(outputDirPath.resolve("03_bidirectional_streaming_service.proto"), outputDirPath,
+//                null, null);
+//        generateSourceCode(outputDirPath.resolve("04_client_streaming_service.proto"), outputDirPath, null, null);
         generateSourceCode(outputDirPath.resolve("05_invalid_resource_service.proto"), outputDirPath, null, null);
-        generateSourceCode(outputDirPath.resolve("06_server_streaming_service.proto"), outputDirPath, null, null);
+//        generateSourceCode(outputDirPath.resolve("06_server_streaming_service.proto"), outputDirPath, null, null);
         generateSourceCode(outputDirPath.resolve("07_unary_server.proto"), outputDirPath, null, null);
         generateSourceCode(outputDirPath.resolve("08_unary_service_with_headers.proto"), outputDirPath, null, null);
         generateSourceCode(outputDirPath.resolve("09_grpc_secured_unary_service.proto"), outputDirPath, null, null);
@@ -332,8 +408,8 @@ public class ToolingCommonTest {
                 null, null);
         generateSourceCode(outputDirPath.resolve("52_unary_ldap_auth.proto"), outputDirPath, null, null);
         generateSourceCode(outputDirPath.resolve("53_server_streaming_negative.proto"), outputDirPath, null, null);
-        generateSourceCode(outputDirPath.resolve("54_backward_compatible_client_proto.proto"), outputDirPath,
-                null, null);
+//        generateSourceCode(outputDirPath.resolve("54_backward_compatible_client_proto.proto"), outputDirPath,
+//                null, null);
         generateSourceCode(outputDirPath.resolve("55_declarative_authentication.proto"), outputDirPath, null, null);
         generateSourceCode(outputDirPath.resolve("56_service_panic_after_send_error.proto"), outputDirPath, null, null);
         generateSourceCode(outputDirPath.resolve("57_struct_type.proto"), outputDirPath, null, null);
@@ -343,5 +419,24 @@ public class ToolingCommonTest {
                 outputDirPath, null, null);
         generateSourceCode(outputDirPath.resolve("61_any_type.proto"), outputDirPath, null, null);
         generateSourceCode(outputDirPath.resolve("62_message_size.proto"), outputDirPath, null, null);
+        generateSourceCode(outputDirPath.resolve("63_enum_with_reserved_names.proto"), outputDirPath, null, null);
+        generateSourceCode(outputDirPath.resolve("64_predefined_records.proto"), outputDirPath, null, null);
+        generateSourceCode(outputDirPath.resolve("65_repeated_types.proto"), outputDirPath, null, null);
+        generateSourceCode(outputDirPath.resolve("66_predefined_types_in_messages.proto"), outputDirPath, null, null);
+        generateSourceCode(outputDirPath.resolve("67_simple_request_with_annotation.proto"), outputDirPath, null, null);
+        generateSourceCode(outputDirPath.resolve("67_simple_response_with_annotation.proto"),
+                outputDirPath, null, null);
+        generateSourceCode(outputDirPath.resolve("67_simple_service_with_annotation.proto"), outputDirPath, null, null);
+        generateSourceCode(outputDirPath.resolve("68_service_with_descriptor_annotation.proto"),
+                outputDirPath, null, null);
+        generateSourceCode(outputDirPath.resolve("72_service_with_updated_proto_definition_client.proto"),
+                outputDirPath, null, null);
+        generateSourceCode(outputDirPath.resolve("73_streaming_with_depending_message.proto"),
+                outputDirPath, null, null);
+        outputDirPath = Paths.get("../ballerina-tests/");
+        generateSourceCode(outputDirPath.resolve("69_package_with_multiple_imports.proto"), outputDirPath, null, null);
+        generateSourceCode(outputDirPath.resolve("70_package_with_nested_modules.proto"), outputDirPath, null, null);
+        generateSourceCode(outputDirPath.resolve("71_package_with_service_in_submodule.proto"), outputDirPath,
+                null, null);
     }
 }

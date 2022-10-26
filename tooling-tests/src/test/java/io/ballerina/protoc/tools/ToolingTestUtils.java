@@ -39,6 +39,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 
+import static io.ballerina.protoc.builder.balgen.BalGenConstants.FILE_SEPARATOR;
+
 /**
  * gRPC tool test Utils.
  */
@@ -61,11 +63,20 @@ public class ToolingTestUtils {
     }
 
     public static void assertGeneratedSources(String subDir, String protoFile, String stubFile, String serviceFile,
-                                              String clientFile, String outputDir) {
+                                              String clientFile, String outputDir, String... subModulesFiles) {
         Path protoFilePath = Paths.get(RESOURCE_DIRECTORY.toString(), PROTO_FILE_DIRECTORY, subDir, protoFile);
         Path outputDirPath = Paths.get(GENERATED_SOURCES_DIRECTORY, outputDir);
 
+        Path protocOutputDirPath;
+        if (outputDir.contains("tool_test_packaging")) {
+            protocOutputDirPath = Paths.get(GENERATED_SOURCES_DIRECTORY);
+        } else {
+            protocOutputDirPath = outputDirPath;
+        }
+
         Path expectedStubFilePath = Paths.get(RESOURCE_DIRECTORY.toString(), BAL_FILE_DIRECTORY, outputDir, stubFile);
+        Path expectedClientStubFilePath = Paths.get(RESOURCE_DIRECTORY.toString(), BAL_FILE_DIRECTORY,
+                outputDir, stubFile.replace(".bal", "_client.bal"));
         Path expectedServiceFilePath = Paths.get(RESOURCE_DIRECTORY.toString(), BAL_FILE_DIRECTORY,
                 outputDir, serviceFile);
         Path expectedClientFilePath = Paths.get(RESOURCE_DIRECTORY.toString(), BAL_FILE_DIRECTORY,
@@ -75,7 +86,7 @@ public class ToolingTestUtils {
         Path actualServiceFilePath = outputDirPath.resolve(serviceFile);
         Path actualClientFilePath = outputDirPath.resolve(clientFile);
 
-        generateSourceCode(protoFilePath, outputDirPath, null, null);
+        generateSourceCode(protoFilePath, protocOutputDirPath, null, null);
         Assert.assertTrue(Files.exists(actualStubFilePath));
 
         Path destTomlFile = Paths.get(GENERATED_SOURCES_DIRECTORY, outputDir, BALLERINA_TOML_FILE);
@@ -90,33 +101,40 @@ public class ToolingTestUtils {
         }
         Assert.assertFalse(Files.exists(actualStubFilePath));
 
-        generateSourceCode(protoFilePath, outputDirPath, "client", null);
+        generateSourceCode(protoFilePath, protocOutputDirPath, "client", null);
         Assert.assertTrue(Files.exists(actualStubFilePath));
         Assert.assertTrue(Files.exists(actualClientFilePath));
         Assert.assertFalse(hasSemanticDiagnostics(outputDirPath, false));
-        Assert.assertEquals(readContent(expectedStubFilePath), readContent(actualStubFilePath));
-        Assert.assertEquals(readContent(expectedClientFilePath),
-                readContent(actualClientFilePath));
+        Assert.assertEquals(readContent(expectedClientStubFilePath), readContent(actualStubFilePath));
+        Assert.assertEquals(readContent(expectedClientFilePath), readContent(actualClientFilePath));
         try {
             Files.deleteIfExists(actualStubFilePath);
+            Files.deleteIfExists(actualClientFilePath);
         } catch (IOException e) {
             Assert.fail("Failed to delete stub file", e);
         }
         Assert.assertFalse(Files.exists(actualStubFilePath));
 
-        generateSourceCode(protoFilePath, outputDirPath, "service", null);
+        generateSourceCode(protoFilePath, protocOutputDirPath, "service", null);
         Assert.assertTrue(Files.exists(actualStubFilePath));
         Assert.assertTrue(Files.exists(actualServiceFilePath));
         Assert.assertFalse(hasSyntacticDiagnostics(actualStubFilePath));
         Assert.assertFalse(hasSyntacticDiagnostics(actualServiceFilePath));
         Assert.assertEquals(readContent(expectedStubFilePath), readContent(actualStubFilePath));
-        Assert.assertEquals(readContent(expectedServiceFilePath),
-                readContent(actualServiceFilePath));
+        Assert.assertEquals(readContent(expectedServiceFilePath), readContent(actualServiceFilePath));
 
         try {
             Files.deleteIfExists(actualServiceFilePath);
         } catch (IOException e) {
             Assert.fail("Failed to delete stub file", e);
+        }
+        if (subModulesFiles.length > 0) {
+            for (String subModuleFile: subModulesFiles.clone()) {
+                expectedStubFilePath = Paths.get(RESOURCE_DIRECTORY.toString(), BAL_FILE_DIRECTORY,
+                        outputDir, subModuleFile);
+                actualStubFilePath = outputDirPath.resolve(subModuleFile);
+                Assert.assertEquals(readContent(expectedStubFilePath), readContent(actualStubFilePath));
+            }
         }
     }
 
@@ -157,6 +175,33 @@ public class ToolingTestUtils {
         }
     }
 
+    public static void assertGeneratedSourcesWithNestedDirectories(String subDir, String outputDir, String importDir) {
+        Path outputDirPath = Paths.get(GENERATED_SOURCES_DIRECTORY, outputDir);
+        Path protocOutputDirPath;
+        if (outputDir.contains("tool_test_packaging")) {
+            protocOutputDirPath = Paths.get(GENERATED_SOURCES_DIRECTORY);
+        } else {
+            protocOutputDirPath = Paths.get(GENERATED_SOURCES_DIRECTORY, outputDir);
+        }
+        try {
+            Class<?> grpcCmdClass = Class.forName("io.ballerina.stdlib.grpc.protobuf.cmd.GrpcCmd");
+            GrpcCmd grpcCmd = (GrpcCmd) grpcCmdClass.getDeclaredConstructor().newInstance();
+            grpcCmd.setProtoPath(RESOURCE_DIRECTORY.toString() + FILE_SEPARATOR + PROTO_FILE_DIRECTORY + subDir);
+            grpcCmd.setBalOutPath(protocOutputDirPath.toAbsolutePath().toString());
+            if (importDir != null) {
+                grpcCmd.setImportPath(Paths.get(RESOURCE_DIRECTORY.toString(), PROTO_FILE_DIRECTORY, importDir)
+                        .toAbsolutePath().toString());
+            }
+            grpcCmd.execute();
+        } catch (ClassNotFoundException | IllegalAccessException | InstantiationException |
+                NoSuchMethodException | InvocationTargetException e) {
+            throw new RuntimeException(e);
+        }
+        Path destTomlFile = outputDirPath.resolve(BALLERINA_TOML_FILE);
+        copyBallerinaToml(destTomlFile);
+        Assert.assertFalse(hasSemanticDiagnostics(outputDirPath, false));
+    }
+
     public static void assertGeneratedDataTypeSourcesNegative(String subDir, String protoFile,
                                                               String stubFile, String outputDir) {
         Path protoFilePath = Paths.get(RESOURCE_DIRECTORY.toString(), PROTO_FILE_DIRECTORY, subDir, protoFile);
@@ -170,7 +215,7 @@ public class ToolingTestUtils {
     public static void generateSourceCode(Path sProtoFilePath, Path sOutputDirPath, String mode, Path sImportDirPath) {
         Class<?> grpcCmdClass;
         try {
-            grpcCmdClass = Class.forName("io.ballerina.protoc.protobuf.cmd.GrpcCmd");
+            grpcCmdClass = Class.forName("io.ballerina.stdlib.grpc.protobuf.cmd.GrpcCmd");
             GrpcCmd grpcCmd = (GrpcCmd) grpcCmdClass.getDeclaredConstructor().newInstance();
             grpcCmd.setProtoPath(sProtoFilePath.toAbsolutePath().toString());
             if (!sOutputDirPath.toString().isBlank()) {
