@@ -19,18 +19,27 @@
 package io.ballerina.protoc.builder.syntaxtree.utils;
 
 import io.ballerina.compiler.syntax.tree.CheckExpressionNode;
+import io.ballerina.compiler.syntax.tree.ImportDeclarationNode;
+import io.ballerina.compiler.syntax.tree.NodeList;
 import io.ballerina.compiler.syntax.tree.TypeDescriptorNode;
 import io.ballerina.protoc.builder.stub.Method;
 import io.ballerina.protoc.builder.stub.StubFile;
 import io.ballerina.protoc.builder.syntaxtree.components.Function;
 import io.ballerina.protoc.builder.syntaxtree.components.IfElse;
+import io.ballerina.protoc.builder.syntaxtree.components.Imports;
 import io.ballerina.protoc.builder.syntaxtree.components.Map;
 import io.ballerina.protoc.builder.syntaxtree.components.VariableDeclaration;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import static io.ballerina.protoc.GrpcConstants.ORG_NAME;
 import static io.ballerina.protoc.MethodDescriptor.MethodType.UNARY;
+import static io.ballerina.protoc.builder.BallerinaFileBuilder.componentsModuleMap;
+import static io.ballerina.protoc.builder.BallerinaFileBuilder.protofileModuleMap;
+import static io.ballerina.protoc.builder.balgen.BalGenConstants.COLON;
+import static io.ballerina.protoc.builder.balgen.BalGenConstants.PACKAGE_SEPARATOR;
 import static io.ballerina.protoc.builder.syntaxtree.components.Expression.getCheckExpressionNode;
 import static io.ballerina.protoc.builder.syntaxtree.components.Expression.getFieldAccessExpressionNode;
 import static io.ballerina.protoc.builder.syntaxtree.components.Expression.getRemoteMethodCallActionNode;
@@ -43,6 +52,8 @@ import static io.ballerina.protoc.builder.syntaxtree.components.TypeDescriptor.g
 import static io.ballerina.protoc.builder.syntaxtree.components.TypeDescriptor.getTypedBindingPatternNode;
 import static io.ballerina.protoc.builder.syntaxtree.components.TypeDescriptor.getUnionTypeDescriptorNode;
 import static io.ballerina.protoc.builder.syntaxtree.components.TypeDescriptor.getWildcardBindingPatternNode;
+import static io.ballerina.protoc.builder.syntaxtree.constants.SyntaxTreeConstants.CONTENT;
+import static io.ballerina.protoc.builder.syntaxtree.constants.SyntaxTreeConstants.HEADERS;
 import static io.ballerina.protoc.builder.syntaxtree.constants.SyntaxTreeConstants.SYNTAX_TREE_VAR_STRING;
 import static io.ballerina.protoc.builder.syntaxtree.constants.SyntaxTreeConstants.SYNTAX_TREE_VAR_STRING_ARRAY;
 
@@ -63,6 +74,10 @@ public class CommonUtils {
 
     public static String capitalizeFirstLetter(String name) {
         return name.substring(0, 1).toUpperCase() + name.substring(1).toLowerCase();
+    }
+
+    public static String toCamelCase(String value) {
+        return value.substring(0, 1).toLowerCase() + value.substring(1);
     }
 
     public static String toPascalCase(String str) {
@@ -131,7 +146,27 @@ public class CommonUtils {
         }
     }
 
-    public static void addClientCallBody(Function function, String inputCap, Method method) {
+    public static String getMethodType(String methodType) {
+        if (methodType == null) {
+            return "";
+        }
+        switch (methodType) {
+            case "byte[]":
+                return "Bytes";
+            case "time:Utc":
+                return "Timestamp";
+            case "time:Seconds":
+                return "Duration";
+            case "map<anydata>":
+                return "Struct";
+            case "'any:Any":
+                return "Any";
+            default:
+                return capitalize(methodType);
+        }
+    }
+
+    public static void addClientCallBody(Function function, String inputCap, Method method, String filename) {
         String methodName = method.getMethodType().equals(UNARY) ? "executeSimpleRPC" : "executeServerStreaming";
         if (method.getInputType() == null) {
             Map empty = new Map();
@@ -152,7 +187,7 @@ public class CommonUtils {
                                         SYNTAX_TREE_VAR_STRING_ARRAY
                                 )
                         ),
-                        getCaptureBindingPatternNode("headers")),
+                        getCaptureBindingPatternNode(HEADERS)),
                 new Map().getMappingConstructorExpressionNode()
         );
         function.addVariableStatement(headers.getVariableDeclarationNode());
@@ -162,7 +197,8 @@ public class CommonUtils {
             if (method.getInputType().equals("string")) {
                 messageType = getBuiltinSimpleNameReferenceNode("string");
             } else {
-                messageType = getSimpleNameReferenceNode(method.getInputType());
+                messageType = getSimpleNameReferenceNode(method.getInputPackagePrefix(filename) +
+                        method.getInputType());
             }
             VariableDeclaration message = new VariableDeclaration(
                     getTypedBindingPatternNode(
@@ -173,7 +209,9 @@ public class CommonUtils {
             function.addVariableStatement(message.getVariableDeclarationNode());
             String contextParam = "Context" + inputCap;
             if (isBallerinaProtobufType(method.getInputType())) {
-                contextParam = getProtobufType(method.getInputType()) + ":" + contextParam;
+                contextParam = getProtobufType(method.getInputType()) + COLON + contextParam;
+            } else {
+                contextParam = getModulePrefix(contextParam, filename) + contextParam;
             }
             IfElse reqIsContext = new IfElse(
                     getTypeTestExpressionNode(
@@ -183,13 +221,13 @@ public class CommonUtils {
             reqIsContext.addIfStatement(
                     getAssignmentStatementNode(
                             "message",
-                            getFieldAccessExpressionNode("req", "content")
+                            getFieldAccessExpressionNode("req", CONTENT)
                     )
             );
             reqIsContext.addIfStatement(
                     getAssignmentStatementNode(
-                            "headers",
-                            getFieldAccessExpressionNode("req", "headers")
+                            HEADERS,
+                            getFieldAccessExpressionNode("req", HEADERS)
                     )
             );
             reqIsContext.addElseStatement(
@@ -204,8 +242,7 @@ public class CommonUtils {
                 getRemoteMethodCallActionNode(
                         getFieldAccessExpressionNode("self", "grpcClient"),
                         methodName,
-                        new String[]{"\"" + method.getMethodId() + "\"", "message", "headers"}
-                )
+                        "\"" + method.getMethodId() + "\"", "message", HEADERS)
         );
         if (method.getOutputType() == null && !function.getFunctionDefinitionNode()
                 .functionName().toString().endsWith("Context")) {
@@ -258,5 +295,50 @@ public class CommonUtils {
                     break;
             }
         }
+    }
+
+    public static String getModulePrefix(String contextParam, String filename) {
+        if (componentsModuleMap.containsKey(contextParam) && protofileModuleMap.containsKey(filename)) {
+            if (!protofileModuleMap.get(filename).equals(componentsModuleMap.get(contextParam))) {
+                return componentsModuleMap.get(contextParam).substring(componentsModuleMap.get(contextParam)
+                        .lastIndexOf(PACKAGE_SEPARATOR) + 1) + COLON;
+            }
+        }
+        return "";
+    }
+
+    public static NodeList<ImportDeclarationNode> addSubModuleImports(List<Method> methodList, String filename,
+                                                                      NodeList<ImportDeclarationNode> imports) {
+        HashSet<String> importedModules = new HashSet();
+        for (Method method: methodList) {
+            if (componentsModuleMap.containsKey(method.getInputType())) {
+                importedModules.add(componentsModuleMap.get(method.getInputType()));
+            }
+            if (componentsModuleMap.containsKey(method.getOutputType())) {
+                importedModules.add(componentsModuleMap.get(method.getOutputType()));
+            }
+        }
+        for (String type: importedModules.toArray(new String[importedModules.size()])) {
+            if (protofileModuleMap.containsKey(filename) && !protofileModuleMap.get(filename).equals(type)) {
+                imports = imports.add(Imports.getImportDeclarationNode(type));
+            }
+        }
+        return imports;
+    }
+
+    public static NodeList<ImportDeclarationNode> addAnyImportIfExists(List<Method> methods,
+                                                                        NodeList<ImportDeclarationNode> imports) {
+        if (checkForImportsInServices(methods, "'any:Any")) {
+            return imports.add(Imports.getImportDeclarationNode(ORG_NAME, "protobuf.types.'any"));
+        }
+        return imports;
+    }
+
+    public static NodeList<ImportDeclarationNode> addTimeImportsIfExists(List<Method> methods,
+                                                                          NodeList<ImportDeclarationNode> imports) {
+        if (checkForImportsInServices(methods, "time:Utc") || checkForImportsInServices(methods, "time:Seconds")) {
+            return imports.add(Imports.getImportDeclarationNode(ORG_NAME, "time"));
+        }
+        return imports;
     }
 }

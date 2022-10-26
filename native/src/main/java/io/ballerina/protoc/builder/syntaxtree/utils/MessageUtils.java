@@ -40,6 +40,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import static io.ballerina.protoc.GrpcConstants.ANN_DESCRIPTOR;
 import static io.ballerina.protoc.builder.syntaxtree.components.Expression.getBinaryExpressionNode;
 import static io.ballerina.protoc.builder.syntaxtree.components.Expression.getBracedExpressionNode;
 import static io.ballerina.protoc.builder.syntaxtree.components.Expression.getFieldAccessExpressionNode;
@@ -70,22 +71,24 @@ public class MessageUtils {
 
     }
 
-    public static NodeList<ModuleMemberDeclarationNode> getMessageNodes(Message message, String descriptorName) {
+    public static NodeList<ModuleMemberDeclarationNode> getMessageNodes(Message message, String descriptorName,
+                                                                        String filename) {
         NodeList<ModuleMemberDeclarationNode> messageMembers = AbstractNodeFactory.createEmptyNodeList();
         NodeList<AnnotationNode> annotationNodes = AbstractNodeFactory.createEmptyNodeList();
 
-        Annotation protobufDescriptor = new Annotation("protobuf", "Descriptor");
+        Annotation protobufDescriptor = new Annotation("protobuf", ANN_DESCRIPTOR);
         protobufDescriptor.addField(
                 "value",
                 descriptorName
         );
         annotationNodes = annotationNodes.add(protobufDescriptor.getAnnotationNode());
         MetadataNode metadataNode = NodeFactory.createMetadataNode(null, annotationNodes);
-        messageMembers = messageMembers.add(getMessageType(message).getTypeDefinitionNode(metadataNode));
+        messageMembers = messageMembers.add(getMessageType(message, filename).getTypeDefinitionNode(metadataNode));
 
         if (message.getNestedMessageList() != null) {
             for (Message nestedMessage : message.getNestedMessageList()) {
-                for (ModuleMemberDeclarationNode messageNode : getMessageNodes(nestedMessage, descriptorName)) {
+                for (ModuleMemberDeclarationNode messageNode : getMessageNodes(nestedMessage, descriptorName,
+                        filename)) {
                     messageMembers = messageMembers.add(messageNode);
                 }
             }
@@ -112,7 +115,7 @@ public class MessageUtils {
         return messageMembers;
     }
 
-    private static Type getMessageType(Message message) {
+    private static Type getMessageType(Message message, String filename) {
         Record messageRecord = new Record();
         for (Field field : message.getFieldList()) {
             if (field.getFieldLabel() == null) {
@@ -122,7 +125,7 @@ public class MessageUtils {
                     case "float":
                     case "boolean":
                         messageRecord.addBasicFieldWithDefaultValue(field.getFieldType(), field.getFieldName(),
-                                field.getDefaultValue());
+                                field.getDefaultValue(filename));
                         break;
                     case "byte[]":
                         messageRecord.addArrayFieldWithDefaultValue("byte", field.getFieldName());
@@ -141,8 +144,8 @@ public class MessageUtils {
                         messageRecord.addCustomFieldWithDefaultValue("'any:Any", field.getFieldName(), "{}");
                         break;
                     default:
-                        messageRecord.addCustomFieldWithDefaultValue(field.getFieldType(), field.getFieldName(),
-                                field.getDefaultValue());
+                        messageRecord.addCustomFieldWithDefaultValue(field.getPackageName(filename) +
+                                        field.getFieldType(), field.getFieldName(), field.getDefaultValue(filename));
                 }
             } else {
                 switch (field.getFieldType()) {
@@ -166,7 +169,8 @@ public class MessageUtils {
                     case "float":
                     case "boolean":
                     default:
-                        messageRecord.addArrayFieldWithDefaultValue(field.getFieldType(), field.getFieldName());
+                        messageRecord.addArrayFieldWithDefaultValue(field.getPackageName(filename) +
+                                field.getFieldType(), field.getFieldName());
                 }
             }
         }
@@ -199,9 +203,11 @@ public class MessageUtils {
                             break;
                         default:
                             if (field.getFieldLabel() == null) {
-                                messageRecord.addOptionalCustomField(field.getFieldType(), field.getFieldName());
+                                messageRecord.addOptionalCustomField(field.getPackageName(filename) +
+                                        field.getFieldType(), field.getFieldName());
                             } else {
-                                messageRecord.addOptionalArrayField(field.getFieldType(), field.getFieldName());
+                                messageRecord.addOptionalArrayField(field.getPackageName(filename) +
+                                        field.getFieldType(), field.getFieldName());
                             }
                     }
                 }
@@ -212,7 +218,8 @@ public class MessageUtils {
                 Record record = new Record();
                 for (Field field : map.getFieldList()) {
                     // Todo: Add a test case with all the field types (int32, int64 ...)
-                    record.addBasicField(field.getFieldType(), field.getFieldName());
+                    record.addBasicField(field.getPackageName(filename) + field.getFieldType(),
+                            field.getFieldName());
                 }
                 messageRecord.addArrayFieldWithDefaultValue(record, map.getMessageName());
             }
@@ -321,8 +328,7 @@ public class MessageUtils {
                         getMethodCallExpressionNode(
                                 getSimpleNameReferenceNode("r"),
                                 "removeIfHasKey",
-                                new String[]{"\"" + oneOfField.getFieldName().replaceAll("'", "") + "\""}
-                        )
+                                "\"" + oneOfField.getFieldName().replaceAll("'", "") + "\"")
                 );
             }
         }

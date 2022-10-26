@@ -67,13 +67,13 @@ public class Message {
         return mapList;
     }
 
-    public static Message.Builder newBuilder(DescriptorProtos.DescriptorProto messageDescriptor, String packageName) {
-        return new Message.Builder(messageDescriptor, messageDescriptor.getName(), packageName);
+    public static Builder newBuilder(DescriptorProtos.DescriptorProto messageDescriptor, String packageName) {
+        return new Builder(messageDescriptor, messageDescriptor.getName(), packageName);
     }
 
-    public static Message.Builder newBuilder(DescriptorProtos.DescriptorProto messageDescriptor, String messageName,
+    public static Builder newBuilder(DescriptorProtos.DescriptorProto messageDescriptor, String messageName,
                                              String packageName) {
-        return new Message.Builder(messageDescriptor, messageName, packageName);
+        return new Builder(messageDescriptor, messageName, packageName);
     }
 
     public List<Message> getNestedMessageList() {

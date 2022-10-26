@@ -25,7 +25,11 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import static io.ballerina.protoc.builder.BallerinaFileBuilder.componentsModuleMap;
 import static io.ballerina.protoc.builder.BallerinaFileBuilder.enumDefaultValueMap;
+import static io.ballerina.protoc.builder.BallerinaFileBuilder.protofileModuleMap;
+import static io.ballerina.protoc.builder.balgen.BalGenConstants.COLON;
+import static io.ballerina.protoc.builder.balgen.BalGenConstants.PACKAGE_SEPARATOR;
 import static io.ballerina.protoc.builder.stub.utils.StubUtils.RESERVED_LITERAL_NAMES;
 
 /**
@@ -38,20 +42,22 @@ public class Field {
     private final String fieldLabel;
     private final String fieldName;
     private final String defaultValue;
+    private final String moduleName;
 
-    private Field(String fieldName, String fieldType, String fieldLabel, String defaultValue) {
+    private Field(String fieldName, String fieldType, String fieldLabel, String defaultValue, String moduleName) {
         this.fieldName = fieldName;
         this.fieldType = fieldType;
         this.fieldLabel = fieldLabel;
         this.defaultValue = defaultValue;
+        this.moduleName = moduleName;
     }
 
-    public static Field.Builder newBuilder(DescriptorProtos.FieldDescriptorProto fieldDescriptor) {
-        return new Field.Builder(fieldDescriptor, fieldDescriptor.getTypeName());
+    public static Builder newBuilder(DescriptorProtos.FieldDescriptorProto fieldDescriptor) {
+        return new Builder(fieldDescriptor, fieldDescriptor.getTypeName());
     }
 
-    public static Field.Builder newBuilder(DescriptorProtos.FieldDescriptorProto fieldDescriptor, String fieldType) {
-        return new Field.Builder(fieldDescriptor, fieldType);
+    public static Builder newBuilder(DescriptorProtos.FieldDescriptorProto fieldDescriptor, String fieldType) {
+        return new Builder(fieldDescriptor, fieldType);
     }
 
     public String getFieldType() {
@@ -66,8 +72,24 @@ public class Field {
         return fieldName;
     }
 
-    public String getDefaultValue() {
+    public String getDefaultValue(String filename) {
+        if (isFieldInsideSubModule(filename)) {
+            return moduleName + COLON + defaultValue;
+        }
         return defaultValue;
+    }
+
+    public String getPackageName(String filename) {
+        if (isFieldInsideSubModule(filename)) {
+            return moduleName + COLON;
+        }
+        return "";
+    }
+
+    private boolean isFieldInsideSubModule(String filename) {
+        return !moduleName.isEmpty() && protofileModuleMap.containsKey(filename) &&
+                !protofileModuleMap.get(filename).substring(protofileModuleMap.get(filename)
+                        .lastIndexOf(PACKAGE_SEPARATOR) + 1).equals(moduleName);
     }
 
     /**
@@ -105,7 +127,12 @@ public class Field {
             if (fieldDescriptor.getType().equals(DescriptorProtos.FieldDescriptorProto.Type.TYPE_ENUM)) {
                 fieldDefaultValue = enumDefaultValueMap.get(fieldType);
             }
-            return new Field(fieldName, fieldType, fieldLabel, fieldDefaultValue);
+            String moduleName = "";
+            if (fieldType.length() > 0 && componentsModuleMap.containsKey(fieldType)) {
+                moduleName = componentsModuleMap.get(fieldType).substring(componentsModuleMap.get(fieldType)
+                        .lastIndexOf(PACKAGE_SEPARATOR) + 1);
+            }
+            return new Field(fieldName, fieldType, fieldLabel, fieldDefaultValue, moduleName);
         }
 
         private Builder(DescriptorProtos.FieldDescriptorProto fieldDescriptor, String fieldType) {

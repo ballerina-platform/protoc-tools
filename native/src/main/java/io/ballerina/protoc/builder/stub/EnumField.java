@@ -36,8 +36,8 @@ public class EnumField {
         this.name = name;
     }
 
-    public static EnumField.Builder newBuilder(DescriptorProtos.EnumValueDescriptorProto fieldDescriptor) {
-        return new EnumField.Builder(fieldDescriptor);
+    public static Builder newBuilder(DescriptorProtos.EnumValueDescriptorProto fieldDescriptor) {
+        return new Builder(fieldDescriptor);
     }
 
     public String getName() {

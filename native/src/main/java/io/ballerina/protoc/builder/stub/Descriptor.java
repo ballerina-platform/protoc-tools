@@ -47,8 +47,8 @@ public class Descriptor {
         return descriptorData;
     }
 
-    public static Descriptor.Builder newBuilder(byte[] descriptorData) {
-        return new Descriptor.Builder(descriptorData);
+    public static Builder newBuilder(byte[] descriptorData) {
+        return new Builder(descriptorData);
     }
 
     /**

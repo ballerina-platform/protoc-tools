@@ -18,6 +18,12 @@
 
 package io.ballerina.protoc;
 
+import io.ballerina.runtime.api.utils.StringUtils;
+import io.ballerina.runtime.api.values.BString;
+
+import static io.ballerina.protoc.ModuleUtils.getModule;
+import static io.ballerina.runtime.api.constants.RuntimeConstants.ORG_NAME_SEPARATOR;
+
 /**
  * Proto Message Constants Class.
  *
@@ -27,4 +33,21 @@ public class GrpcConstants {
 
     public static final String REGEX_DOT_SEPERATOR = "\\.";
     public static final String DOT = ".";
+
+    public static final String PROTOCOL_PACKAGE_GRPC = "grpc";
+    public static final String PROTOCOL_PACKAGE_VERSION_GRPC = getModule().getVersion();
+    public static final String ORG_NAME = "ballerina";
+    public static final String PROTOCOL_STRUCT_PACKAGE_GRPC = ORG_NAME + ORG_NAME_SEPARATOR +
+            "grpc:" + PROTOCOL_PACKAGE_VERSION_GRPC;
+    public static final String PROTOCOL_STRUCT_PACKAGE_PROTOBUF = ORG_NAME + ORG_NAME_SEPARATOR +
+            "protobuf:" + PROTOCOL_PACKAGE_VERSION_GRPC;
+
+    public static final String ANN_SERVICE_DESCRIPTOR = "ServiceDescriptor";
+    public static final BString ANN_SERVICE_DESCRIPTOR_FQN = StringUtils.fromString(PROTOCOL_STRUCT_PACKAGE_GRPC +
+            ":" + ANN_SERVICE_DESCRIPTOR);
+    public static final String ANN_DESCRIPTOR = "Descriptor";
+    public static final BString ANN_DESCRIPTOR_FQN = StringUtils.fromString(PROTOCOL_STRUCT_PACKAGE_GRPC + ":" +
+            ANN_DESCRIPTOR);
+    public static final BString ANN_PROTOBUF_DESCRIPTOR = StringUtils.fromString(PROTOCOL_STRUCT_PACKAGE_PROTOBUF +
+            ":" + ANN_DESCRIPTOR);
 }

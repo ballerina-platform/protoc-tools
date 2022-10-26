@@ -68,6 +68,14 @@ public class Function {
         statements = NodeFactory.createEmptyNodeList();
     }
 
+    public Function() {
+        qualifierList = AbstractNodeFactory.createEmptyNodeList();
+        functionName = AbstractNodeFactory.createIdentifierToken("");
+        relativeResourcePath = AbstractNodeFactory.createEmptyNodeList();
+        parameters = new ArrayList<>();
+        statements = NodeFactory.createEmptyNodeList();
+    }
+
     public FunctionDefinitionNode getFunctionDefinitionNode() {
         return NodeFactory.createFunctionDefinitionNode(
                 kind,
@@ -88,7 +96,7 @@ public class Function {
         }
     }
 
-    private FunctionSignatureNode getFunctionSignature() {
+    public FunctionSignatureNode getFunctionSignature() {
         return NodeFactory.createFunctionSignatureNode(
                 SyntaxTreeConstants.SYNTAX_TREE_OPEN_PAREN,
                 AbstractNodeFactory.createSeparatedNodeList(parameters),
@@ -130,12 +138,13 @@ public class Function {
         returnTypeDescriptorNode = getReturnTypeDescriptorNode(node);
     }
 
-    private FunctionBodyNode getFunctionBody() {
+    public FunctionBodyNode getFunctionBody() {
         return NodeFactory.createFunctionBodyBlockNode(
                 SyntaxTreeConstants.SYNTAX_TREE_OPEN_BRACE,
                 null,
                 statements,
-                SyntaxTreeConstants.SYNTAX_TREE_CLOSE_BRACE
+                SyntaxTreeConstants.SYNTAX_TREE_CLOSE_BRACE,
+                null
         );
     }
 

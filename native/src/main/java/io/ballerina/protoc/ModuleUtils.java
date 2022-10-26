@@ -11,22 +11,36 @@
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied. See the License for the
+ * KIND, either express or implied.  See the License for the
  * specific language governing permissions and limitations
  * under the License.
  */
 
-module io.ballerina.protoc {
-    requires proto.google.common.protos;
-    requires io.ballerina.runtime;
-    requires io.ballerina.lang;
-    requires io.ballerina.tools.api;
-    requires io.ballerina.parser;
-    requires io.ballerina.formatter.core;
-    requires io.ballerina.cli;
-    requires io.ballerina.toml;
-    requires com.google.protobuf;
-    requires info.picocli;
-    requires org.slf4j;
-    requires org.apache.commons.lang3;
+package io.ballerina.protoc;
+
+import io.ballerina.runtime.api.Environment;
+import io.ballerina.runtime.api.Module;
+
+/**
+ * This class will hold module related utility functions.
+ *
+ * @since 0.1.0
+ */
+public class ModuleUtils {
+
+    /**
+     * gRPC standard library package ID.
+     */
+    private static Module grpcModule = null;
+
+    private ModuleUtils() {
+    }
+
+    public static void setModule(Environment env) {
+        grpcModule = env.getCurrentModule();
+    }
+
+    public static Module getModule() {
+        return grpcModule;
+    }
 }

@@ -32,6 +32,7 @@ import io.ballerina.protoc.builder.syntaxtree.components.VariableDeclaration;
 import io.ballerina.protoc.builder.syntaxtree.constants.SyntaxTreeConstants;
 
 import static io.ballerina.protoc.MethodDescriptor.MethodType.BIDI_STREAMING;
+import static io.ballerina.protoc.builder.balgen.BalGenConstants.COLON;
 import static io.ballerina.protoc.builder.syntaxtree.components.Expression.getCheckExpressionNode;
 import static io.ballerina.protoc.builder.syntaxtree.components.Expression.getExplicitNewExpressionNode;
 import static io.ballerina.protoc.builder.syntaxtree.components.Expression.getFieldAccessExpressionNode;
@@ -53,10 +54,14 @@ import static io.ballerina.protoc.builder.syntaxtree.components.TypeDescriptor.g
 import static io.ballerina.protoc.builder.syntaxtree.components.TypeDescriptor.getTypedBindingPatternNode;
 import static io.ballerina.protoc.builder.syntaxtree.components.TypeDescriptor.getUnionTypeDescriptorNode;
 import static io.ballerina.protoc.builder.syntaxtree.components.TypeDescriptor.getWildcardBindingPatternNode;
+import static io.ballerina.protoc.builder.syntaxtree.constants.SyntaxTreeConstants.CONTENT;
+import static io.ballerina.protoc.builder.syntaxtree.constants.SyntaxTreeConstants.HEADERS;
+import static io.ballerina.protoc.builder.syntaxtree.constants.SyntaxTreeConstants.STREAMING_CLIENT;
 import static io.ballerina.protoc.builder.syntaxtree.constants.SyntaxTreeConstants.SYNTAX_TREE_GRPC_ERROR_OPTIONAL;
 import static io.ballerina.protoc.builder.syntaxtree.constants.SyntaxTreeConstants.SYNTAX_TREE_VAR_STRING;
 import static io.ballerina.protoc.builder.syntaxtree.constants.SyntaxTreeConstants.SYNTAX_TREE_VAR_STRING_ARRAY;
 import static io.ballerina.protoc.builder.syntaxtree.utils.CommonUtils.capitalize;
+import static io.ballerina.protoc.builder.syntaxtree.utils.CommonUtils.getModulePrefix;
 import static io.ballerina.protoc.builder.syntaxtree.utils.CommonUtils.getProtobufType;
 import static io.ballerina.protoc.builder.syntaxtree.utils.CommonUtils.isBallerinaProtobufType;
 
@@ -74,7 +79,7 @@ public class ClientUtils {
     public static Function getStreamingClientFunction(Method method) {
         String methodName = method.getMethodType().equals(BIDI_STREAMING) ? "executeBidirectionalStreaming" :
                 "executeClientStreaming";
-        String clientName = capitalize(method.getMethodName()) + "StreamingClient";
+        String clientName = capitalize(method.getMethodName()) + STREAMING_CLIENT;
         Function function = new Function(method.getMethodName());
         function.addReturns(
                 getUnionTypeDescriptorNode(
@@ -84,15 +89,14 @@ public class ClientUtils {
         );
         VariableDeclaration sClient = new VariableDeclaration(
                 getTypedBindingPatternNode(
-                        getQualifiedNameReferenceNode("grpc", "StreamingClient"),
+                        getQualifiedNameReferenceNode("grpc", STREAMING_CLIENT),
                         getCaptureBindingPatternNode("sClient")
                 ),
                 getCheckExpressionNode(
                         getRemoteMethodCallActionNode(
                                 getFieldAccessExpressionNode("self", "grpcClient"),
                                 methodName,
-                                new String[]{"\"" + method.getMethodId() + "\""}
-                        )
+                                "\"" + method.getMethodId() + "\"")
                 )
         );
         function.addVariableStatement(sClient.getVariableDeclarationNode());
@@ -101,9 +105,9 @@ public class ClientUtils {
         return function;
     }
 
-    public static Class getStreamingClientClass(Method method) {
+    public static Class getStreamingClientClass(Method method, String filename) {
         String name = method.getMethodName().substring(0, 1).toUpperCase() + method.getMethodName().substring(1) +
-                "StreamingClient";
+                STREAMING_CLIENT;
         Class streamingClient = new Class(name, true);
         streamingClient.addQualifiers(new String[]{"client"});
 
@@ -111,18 +115,18 @@ public class ClientUtils {
                 getObjectFieldNode(
                         "private",
                         new String[]{},
-                        getQualifiedNameReferenceNode("grpc", "StreamingClient"),
+                        getQualifiedNameReferenceNode("grpc", STREAMING_CLIENT),
                         "sClient"));
 
         streamingClient.addMember(getInitFunction().getFunctionDefinitionNode());
 
-        streamingClient.addMember(getSendFunction(method).getFunctionDefinitionNode());
+        streamingClient.addMember(getSendFunction(method, filename).getFunctionDefinitionNode());
 
-        streamingClient.addMember(getSendContextFunction(method).getFunctionDefinitionNode());
+        streamingClient.addMember(getSendContextFunction(method, filename).getFunctionDefinitionNode());
 
-        streamingClient.addMember(getReceiveFunction(method).getFunctionDefinitionNode());
+        streamingClient.addMember(getReceiveFunction(method, filename).getFunctionDefinitionNode());
 
-        streamingClient.addMember(getReceiveContextFunction(method).getFunctionDefinitionNode());
+        streamingClient.addMember(getReceiveContextFunction(method, filename).getFunctionDefinitionNode());
 
         streamingClient.addMember(getSendErrorFunction().getFunctionDefinitionNode());
 
@@ -134,7 +138,7 @@ public class ClientUtils {
     private static Function getInitFunction() {
         Function function = new Function("init");
         function.addRequiredParameter(
-                TypeDescriptor.getQualifiedNameReferenceNode("grpc", "StreamingClient"),
+                TypeDescriptor.getQualifiedNameReferenceNode("grpc", STREAMING_CLIENT),
                 "sClient"
         );
         function.addAssignmentStatement(
@@ -145,7 +149,7 @@ public class ClientUtils {
         return function;
     }
 
-    private static Function getSendFunction(Method method) {
+    private static Function getSendFunction(Method method, String filename) {
         String inputCap;
         switch (method.getInputType()) {
             case "byte[]":
@@ -169,7 +173,7 @@ public class ClientUtils {
         }
         Function function = new Function("send" + inputCap);
         function.addRequiredParameter(
-                getSimpleNameReferenceNode(method.getInputType()),
+                getSimpleNameReferenceNode(method.getInputPackagePrefix(filename) + method.getInputType()),
                 "message"
         );
         function.addReturns(SyntaxTreeConstants.SYNTAX_TREE_GRPC_ERROR_OPTIONAL);
@@ -177,14 +181,13 @@ public class ClientUtils {
                 getRemoteMethodCallActionNode(
                         getFieldAccessExpressionNode("self", "sClient"),
                         "send",
-                        new String[]{"message"}
-                )
+                        "message")
         );
         function.addQualifiers(new String[]{"isolated", "remote"});
         return function;
     }
 
-    private static Function getSendContextFunction(Method method) {
+    private static Function getSendContextFunction(Method method, String filename) {
         String inputCap;
         switch (method.getInputType()) {
             case "byte[]":
@@ -209,7 +212,9 @@ public class ClientUtils {
         Function function = new Function("sendContext" + inputCap);
         String contextParam = "Context" + inputCap;
         if (isBallerinaProtobufType(method.getInputType())) {
-            contextParam = getProtobufType(method.getInputType()) + ":" + contextParam;
+            contextParam = getProtobufType(method.getInputType()) + COLON + contextParam;
+        } else {
+            contextParam = getModulePrefix(contextParam, filename) + contextParam;
         }
         function.addRequiredParameter(
                 getSimpleNameReferenceNode(contextParam),
@@ -220,14 +225,13 @@ public class ClientUtils {
                 getRemoteMethodCallActionNode(
                         getFieldAccessExpressionNode("self", "sClient"),
                         "send",
-                        new String[]{"message"}
-                )
+                        "message")
         );
         function.addQualifiers(new String[]{"isolated", "remote"});
         return function;
     }
 
-    private static Function getReceiveFunction(Method method) {
+    private static Function getReceiveFunction(Method method, String filename) {
         String functionName = "receive";
         if (method.getOutputType() != null) {
             String outCap;
@@ -267,7 +271,7 @@ public class ClientUtils {
         if (method.getOutputType() != null) {
             function.addReturns(
                     TypeDescriptor.getUnionTypeDescriptorNode(
-                            getSimpleNameReferenceNode(method.getOutputType()),
+                            getSimpleNameReferenceNode(method.getOutputPackageType(filename) + method.getOutputType()),
                             SYNTAX_TREE_GRPC_ERROR_OPTIONAL
                     )
             );
@@ -282,8 +286,7 @@ public class ClientUtils {
                 getCheckExpressionNode(
                         getRemoteMethodCallActionNode(
                                 getFieldAccessExpressionNode("self", "sClient"),
-                                "receive",
-                                new String[]{}
+                                "receive"
                         )
                 )
         );
@@ -325,8 +328,7 @@ public class ClientUtils {
                         getReturnStatementNode(
                                 getMethodCallExpressionNode(
                                         getSimpleNameReferenceNode("payload"),
-                                        "toString",
-                                        new String[]{}
+                                        "toString"
                                 )
                         )
                 );
@@ -337,8 +339,7 @@ public class ClientUtils {
                                         method.getOutputType(),
                                         getMethodCallExpressionNode(
                                                 getSimpleNameReferenceNode("payload"),
-                                                "cloneReadOnly",
-                                                new String[]{}
+                                                "cloneReadOnly"
                                         )
                                 )
                         )
@@ -347,7 +348,7 @@ public class ClientUtils {
                 responseCheck.addElseStatement(
                         getReturnStatementNode(
                                 getTypeCastExpressionNode(
-                                        method.getOutputType(),
+                                        method.getOutputPackageType(filename) + method.getOutputType(),
                                         getSimpleNameReferenceNode("payload")
                                 )
                         )
@@ -359,7 +360,7 @@ public class ClientUtils {
         return function;
     }
 
-    private static Function getReceiveContextFunction(Method method) {
+    private static Function getReceiveContextFunction(Method method, String filename) {
         String outCap = "Nil";
         if (method.getOutputType() != null) {
             switch (method.getOutputType()) {
@@ -398,17 +399,19 @@ public class ClientUtils {
         if (method.getOutputType() == null) {
             receiveArgsPattern = getTypedBindingPatternNode(
                     getTupleTypeDescriptorNode(receiveArgs),
-                    getListBindingPatternNode(new String[]{"_", "headers"})
+                    getListBindingPatternNode(new String[]{"_", HEADERS})
             );
         } else {
             receiveArgsPattern = getTypedBindingPatternNode(
                     getTupleTypeDescriptorNode(receiveArgs),
-                    getListBindingPatternNode(new String[]{"payload", "headers"})
+                    getListBindingPatternNode(new String[]{"payload", HEADERS})
             );
         }
         String contextParam = "Context" + outCap;
         if (isBallerinaProtobufType(method.getOutputType())) {
-            contextParam = getProtobufType(method.getOutputType()) + ":" + contextParam;
+            contextParam = getProtobufType(method.getOutputType()) + COLON + contextParam;
+        } else {
+            contextParam = getModulePrefix(contextParam, filename) + contextParam;
         }
         function.addReturns(
                 TypeDescriptor.getUnionTypeDescriptorNode(
@@ -424,8 +427,7 @@ public class ClientUtils {
                 getCheckExpressionNode(
                         getRemoteMethodCallActionNode(
                                 getFieldAccessExpressionNode("self", "sClient"),
-                                "receive",
-                                new String[]{}
+                                "receive"
                         )
                 )
         );
@@ -451,30 +453,28 @@ public class ClientUtils {
         if (method.getOutputType() != null) {
             if (method.getOutputType().equals("string")) {
                 returnMap.addMethodCallField(
-                        "content",
+                        CONTENT,
                         getSimpleNameReferenceNode("payload"),
-                        "toString",
-                        new String[]{}
+                        "toString"
                 );
             } else if (method.getOutputType().equals("time:Utc")) {
                 returnMap.addTypeCastExpressionField(
-                        "content",
+                        CONTENT,
                         method.getOutputType(),
                         getMethodCallExpressionNode(
                                 getSimpleNameReferenceNode("payload"),
-                                "cloneReadOnly",
-                                new String[]{}
+                                "cloneReadOnly"
                         )
                 );
             } else {
                 returnMap.addTypeCastExpressionField(
-                        "content",
-                        method.getOutputType(),
+                        CONTENT,
+                        method.getOutputPackageType(filename) + method.getOutputType(),
                         getSimpleNameReferenceNode("payload")
                 );
             }
         }
-        returnMap.addSimpleNameReferenceField("headers", "headers");
+        returnMap.addSimpleNameReferenceField(HEADERS, HEADERS);
         responseCheck.addElseStatement(
                 getReturnStatementNode(
                         returnMap.getMappingConstructorExpressionNode()
@@ -493,8 +493,7 @@ public class ClientUtils {
                 getRemoteMethodCallActionNode(
                         getFieldAccessExpressionNode("self", "sClient"),
                         "sendError",
-                        new String[]{"response"}
-                )
+                        "response")
         );
         function.addQualifiers(new String[]{"isolated", "remote"});
         return function;
@@ -506,8 +505,7 @@ public class ClientUtils {
         function.addReturnStatement(
                 getRemoteMethodCallActionNode(
                         getFieldAccessExpressionNode("self", "sClient"),
-                        "complete",
-                        new String[]{}
+                        "complete"
                 )
         );
         function.addQualifiers(new String[]{"isolated", "remote"});

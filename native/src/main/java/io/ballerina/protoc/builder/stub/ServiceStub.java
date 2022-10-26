@@ -50,8 +50,8 @@ public class ServiceStub {
         this.serviceName = serviceName;
     }
 
-    public static ServiceStub.Builder newBuilder(String serviceName) {
-        return new ServiceStub.Builder(serviceName);
+    public static Builder newBuilder(String serviceName) {
+        return new Builder(serviceName);
     }
 
     public String getServiceName() {

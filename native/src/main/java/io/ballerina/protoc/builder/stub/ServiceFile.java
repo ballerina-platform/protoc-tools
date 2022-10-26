@@ -29,8 +29,8 @@ public class ServiceFile extends AbstractStub {
     private ServiceFile() {
     }
 
-    public static ServiceFile.Builder newBuilder(String serviceName) {
-        return new ServiceFile.Builder(serviceName);
+    public static Builder newBuilder(String serviceName) {
+        return new Builder(serviceName);
     }
 
     /**

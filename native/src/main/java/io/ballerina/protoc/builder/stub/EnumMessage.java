@@ -38,13 +38,13 @@ public class EnumMessage {
         this.fieldList = fieldList;
     }
 
-    public static EnumMessage.Builder newBuilder(DescriptorProtos.EnumDescriptorProto enumDescriptor) {
-        return new EnumMessage.Builder(enumDescriptor, enumDescriptor.getName());
+    public static Builder newBuilder(DescriptorProtos.EnumDescriptorProto enumDescriptor) {
+        return new Builder(enumDescriptor, enumDescriptor.getName());
     }
 
-    public static EnumMessage.Builder newBuilder(DescriptorProtos.EnumDescriptorProto enumDescriptor,
+    public static Builder newBuilder(DescriptorProtos.EnumDescriptorProto enumDescriptor,
                                                  String messageName) {
-        return new EnumMessage.Builder(enumDescriptor, messageName);
+        return new Builder(enumDescriptor, messageName);
     }
 
     public List<EnumField> getFieldList() {

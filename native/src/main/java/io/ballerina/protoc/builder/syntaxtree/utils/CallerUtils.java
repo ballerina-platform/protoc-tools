@@ -23,6 +23,10 @@ import io.ballerina.protoc.builder.syntaxtree.components.Function;
 import io.ballerina.protoc.builder.syntaxtree.components.TypeDescriptor;
 import io.ballerina.protoc.builder.syntaxtree.constants.SyntaxTreeConstants;
 
+import static io.ballerina.protoc.builder.BallerinaFileBuilder.componentsModuleMap;
+import static io.ballerina.protoc.builder.BallerinaFileBuilder.protofileModuleMap;
+import static io.ballerina.protoc.builder.balgen.BalGenConstants.COLON;
+import static io.ballerina.protoc.builder.balgen.BalGenConstants.PACKAGE_SEPARATOR;
 import static io.ballerina.protoc.builder.syntaxtree.components.Expression.getFieldAccessExpressionNode;
 import static io.ballerina.protoc.builder.syntaxtree.components.Expression.getMethodCallExpressionNode;
 import static io.ballerina.protoc.builder.syntaxtree.components.Expression.getRemoteMethodCallActionNode;
@@ -30,6 +34,7 @@ import static io.ballerina.protoc.builder.syntaxtree.components.TypeDescriptor.g
 import static io.ballerina.protoc.builder.syntaxtree.components.TypeDescriptor.getQualifiedNameReferenceNode;
 import static io.ballerina.protoc.builder.syntaxtree.components.TypeDescriptor.getSimpleNameReferenceNode;
 import static io.ballerina.protoc.builder.syntaxtree.utils.CommonUtils.capitalize;
+import static io.ballerina.protoc.builder.syntaxtree.utils.CommonUtils.getModulePrefix;
 import static io.ballerina.protoc.builder.syntaxtree.utils.CommonUtils.getProtobufType;
 import static io.ballerina.protoc.builder.syntaxtree.utils.CommonUtils.isBallerinaProtobufType;
 
@@ -44,7 +49,7 @@ public class CallerUtils {
 
     }
 
-    public static Class getCallerClass(String key, String value) {
+    public static Class getCallerClass(String key, String value, String filename) {
         Class caller = new Class(key, true);
         caller.addQualifiers(new String[]{"client"});
 
@@ -73,8 +78,7 @@ public class CallerUtils {
         getId.addReturnStatement(
                 getMethodCallExpressionNode(
                         getFieldAccessExpressionNode("self", "caller"),
-                        "getId",
-                        new String[]{}
+                        "getId"
                 )
         );
         getId.addQualifiers(new String[]{"public", "isolated"});
@@ -102,6 +106,13 @@ public class CallerUtils {
                     valueCap = capitalize(value);
                     break;
             }
+            if (protofileModuleMap.containsKey(filename) && componentsModuleMap.containsKey(value)) {
+                String componentModule = componentsModuleMap.get(value);
+                if (!protofileModuleMap.get(filename).equals(componentModule)) {
+                    value = componentModule.substring(componentModule.lastIndexOf(PACKAGE_SEPARATOR) + 1) + COLON
+                            + value;
+                }
+            }
             Function send = new Function("send" + valueCap);
             send.addRequiredParameter(
                     getSimpleNameReferenceNode(value),
@@ -112,15 +123,16 @@ public class CallerUtils {
                     getRemoteMethodCallActionNode(
                             getFieldAccessExpressionNode("self", "caller"),
                             "send",
-                            new String[]{"response"}
-                    )
+                            "response")
             );
             send.addQualifiers(new String[]{"isolated", "remote"});
             caller.addMember(send.getFunctionDefinitionNode());
 
             String contextParam = "Context" + valueCap;
             if (isBallerinaProtobufType(value)) {
-                contextParam = getProtobufType(value) + ":" + contextParam;
+                contextParam = getProtobufType(value) + COLON + contextParam;
+            } else {
+                contextParam = getModulePrefix(contextParam, filename) + contextParam;
             }
             Function sendContext = new Function("sendContext" + valueCap);
             sendContext.addRequiredParameter(
@@ -132,8 +144,7 @@ public class CallerUtils {
                     getRemoteMethodCallActionNode(
                             getFieldAccessExpressionNode("self", "caller"),
                             "send",
-                            new String[]{"response"}
-                    )
+                            "response")
             );
             sendContext.addQualifiers(new String[]{"isolated", "remote"});
             caller.addMember(sendContext.getFunctionDefinitionNode());
@@ -146,8 +157,7 @@ public class CallerUtils {
                 getRemoteMethodCallActionNode(
                         getFieldAccessExpressionNode("self", "caller"),
                         "sendError",
-                        new String[]{"response"}
-                )
+                        "response")
         );
         sendError.addQualifiers(new String[]{"isolated", "remote"});
         caller.addMember(sendError.getFunctionDefinitionNode());
@@ -157,8 +167,7 @@ public class CallerUtils {
         complete.addReturnStatement(
                 getRemoteMethodCallActionNode(
                         getFieldAccessExpressionNode("self", "caller"),
-                        "complete",
-                        new String[]{}
+                        "complete"
                 )
         );
         complete.addQualifiers(new String[]{"isolated", "remote"});
@@ -169,8 +178,7 @@ public class CallerUtils {
         isCancelled.addReturnStatement(
                 getMethodCallExpressionNode(
                         getFieldAccessExpressionNode("self", "caller"),
-                        "isCancelled",
-                        new String[]{}
+                        "isCancelled"
                 )
         );
         isCancelled.addQualifiers(new String[]{"public", "isolated"});
