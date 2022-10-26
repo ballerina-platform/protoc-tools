@@ -36,7 +36,7 @@ dependencies {
     testImplementation group: 'org.ballerinalang', name: 'ballerina-lang', version: "${ballerinaLangVersion}"
     testImplementation group: 'org.ballerinalang', name: 'ballerina-tools-api', version: "${ballerinaLangVersion}"
     testImplementation group: 'org.ballerinalang', name: 'ballerina-parser', version: "${ballerinaLangVersion}"
-    testImplementation project(":protoc-tools-native")
+    testImplementation project(":protoc-cli")
     testImplementation group: 'org.testng', name: 'testng', version: "${testngVersion}"
 }
 
@@ -116,5 +116,4 @@ compileJava {
     }
 }
 
-test.dependsOn ":protoc-tools-native:build"
-test.dependsOn ":protoc-tools-ballerina:build"
+test.dependsOn ":protoc-cli:build"

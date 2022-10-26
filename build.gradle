@@ -17,11 +17,15 @@
  */
 
 plugins {
+    id 'java'
+    id 'jacoco'
     id "com.github.spotbugs" version "${githubSpotbugsVersion}"
     id "com.github.johnrengelman.shadow" version "${githubJohnrengelmanShadowVersion}"
     id "de.undercouch.download" version "${underCouchDownloadVersion}"
     id "net.researchgate.release" version "${researchgateReleaseVersion}"
 }
+
+def packageName = "protoc"
 
 allprojects {
     group = project.group
@@ -32,6 +36,15 @@ allprojects {
 
     repositories {
         mavenLocal()
+
+        maven {
+            url = 'https://maven.pkg.github.com/ballerina-platform/*'
+            credentials {
+                username System.getenv("packageUser")
+                password System.getenv("packagePAT")
+            }
+        }
+
         maven {
             url = 'https://maven.wso2.org/nexus/content/repositories/releases/'
         }
@@ -42,14 +55,6 @@ allprojects {
 
         maven {
             url = 'https://repo.maven.apache.org/maven2'
-        }
-
-        maven {
-            url = 'https://maven.pkg.github.com/ballerina-platform/*'
-            credentials {
-                username System.getenv("packageUser")
-                password System.getenv("packagePAT")
-            }
         }
 
         maven {
@@ -64,11 +69,12 @@ allprojects {
 }
 
 subprojects {
-
+    apply plugin: 'java'
     configurations {
+        externalJars
         ballerinaStdLibs
-    
     }
+
     dependencies {
 
         /* Standard libraries */
@@ -80,19 +86,89 @@ subprojects {
 def moduleVersion = project.version.replace("-SNAPSHOT", "")
 
 release {
-    failOnPublishNeeded = false
-    failOnSnapshotDependencies = true
-
-    buildTasks = ['build']
     versionPropertyFile = 'gradle.properties'
-    tagTemplate = 'v$version'
-
+    tagTemplate = 'v${version}'
     git {
+        // To release from any branch
         requireBranch = "release-${moduleVersion}"
         pushToRemote = 'origin'
     }
 }
 
-task build {
-    dependsOn('protoc-tools-ballerina:build')
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
 }
+
+task codeCoverageReport(type: JacocoReport) {
+    dependsOn = subprojects.test
+
+    executionData fileTree(project.rootDir.absolutePath).include("**/build/coverage-reports/*.exec")
+
+    subprojects.each {
+        sourceSets it.sourceSets.main
+    }
+    reports {
+        xml.enabled(true)
+        html.enabled(true)
+        csv.enabled(true)
+        xml.destination(new File("${buildDir}/reports/jacoco/report.xml"))
+        html.destination(new File("${buildDir}/reports/jacoco/report.html"))
+        csv.destination(new File("${buildDir}/reports/jacoco/report.csv"))
+    }
+
+    onlyIf = {
+        true
+    }
+}
+
+def artifactCacheParent = file("$project.projectDir/build/cache_parent/")
+def artifactLibParent = file("$project.projectDir/build/lib_parent/")
+def targetProtocCliJar = file("$project.rootDir/protoc-cli/build/libs/protoc-cli-${project.version}.jar")
+
+jar {
+    manifest {
+        attributes('Implementation-Title': project.name,
+                'Implementation-Version': project.version)
+    }
+}
+
+task directoryBuild {
+    inputs.dir file(project.projectDir)
+    doLast {
+        copy {
+            from targetProtocCliJar
+            into file("$artifactLibParent/libs")
+        }
+    }
+
+    outputs.dir artifactCacheParent
+    outputs.dir artifactLibParent
+}
+
+task createArtifactZip(type: Zip) {
+    destinationDirectory = file("${buildDir}/distributions")
+    from directoryBuild
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            artifact source: createArtifactZip, extension: 'zip'
+        }
+    }
+
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/ballerina-platform/protoc-tools")
+            credentials {
+                username = System.getenv("publishUser")
+                password = System.getenv("publishPAT")
+            }
+        }
+    }
+}
+
+directoryBuild.dependsOn ":${packageName}-cli:build"
+build.dependsOn directoryBuild
+

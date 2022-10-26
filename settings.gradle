@@ -14,13 +14,11 @@ plugins {
 rootProject.name = 'grpc'
 
 include ':checkstyle'
-include ':protoc-tools-native'
-include ':protoc-tools-ballerina'
+include ':protoc-cli'
 include ':protoc-tools-tooling-tests'
 
 project(':checkstyle').projectDir = file("build-config${File.separator}checkstyle")
-project(':protoc-tools-native').projectDir = file('native')
-project(':protoc-tools-ballerina').projectDir = file('ballerina')
+project(':protoc-cli').projectDir = file('protoc-cli')
 project(':protoc-tools-tooling-tests').projectDir = file('tooling-tests')
 
 gradleEnterprise {
