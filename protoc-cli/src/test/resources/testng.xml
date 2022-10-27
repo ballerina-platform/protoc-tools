@@ -24,7 +24,7 @@
     <listeners>
         <listener class-name="io.ballerina.protoc.util.TestNGListener" />
     </listeners>
-    <test name="grpc-native-test-suite" preserve-order="true" parallel="false">
+    <test name="protoc-cli-test-suite" preserve-order="true" parallel="false">
         <packages>
             <package name="io.ballerina.protoc.*"/>
         </packages>
