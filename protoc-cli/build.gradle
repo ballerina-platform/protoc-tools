@@ -48,9 +48,7 @@ dependencies {
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: "${commonsLang3Version}"
     implementation group: 'com.google.api.grpc', name: 'proto-google-common-protos', version: "${protoGoogleCommonsVersion}"
     implementation group: 'com.google.protobuf', name: 'protobuf-java', version: "${protobufJavaVersion}"
-    implementation group: 'io.netty', name: 'netty-codec-http', version: "${nettyVersion}"
     implementation group: 'info.picocli', name: 'picocli', version: "${picocliVersion}"
-    implementation group: 'io.ballerina.stdlib', name: 'protobuf-native', version: "${stdlibProtobufVersion}"
 
     testImplementation group: 'org.testng', name: 'testng', version: "${testngVersion}"
 }
