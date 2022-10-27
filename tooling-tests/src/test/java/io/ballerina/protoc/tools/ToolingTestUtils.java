@@ -22,11 +22,8 @@ import io.ballerina.compiler.syntax.tree.SyntaxTree;
 import io.ballerina.projects.DiagnosticResult;
 import io.ballerina.projects.Package;
 import io.ballerina.projects.PackageCompilation;
-import io.ballerina.projects.ProjectEnvironmentBuilder;
 import io.ballerina.projects.directory.BuildProject;
 import io.ballerina.projects.directory.SingleFileProject;
-import io.ballerina.projects.environment.Environment;
-import io.ballerina.projects.environment.EnvironmentBuilder;
 import io.ballerina.protoc.protobuf.cmd.GrpcCmd;
 import io.ballerina.tools.text.TextDocument;
 import io.ballerina.tools.text.TextDocuments;
@@ -53,14 +50,7 @@ public class ToolingTestUtils {
 
     public static final Path RESOURCE_DIRECTORY = Paths.get("src", "test", "resources", "test-src")
             .toAbsolutePath();
-    private static final Path DISTRIBUTION_PATH = Paths.get("../", "target", "ballerina-runtime")
-            .toAbsolutePath();
     private static final Path BALLERINA_TOML_PATH = Paths.get(RESOURCE_DIRECTORY.toString(), BALLERINA_TOML_FILE);
-
-    private static ProjectEnvironmentBuilder getEnvironmentBuilder() {
-        Environment environment = EnvironmentBuilder.getBuilder().setBallerinaHome(DISTRIBUTION_PATH).build();
-        return ProjectEnvironmentBuilder.getBuilder(environment);
-    }
 
     public static void assertGeneratedSources(String subDir, String protoFile, String stubFile, String serviceFile,
                                               String clientFile, String outputDir, String... subModulesFiles) {
@@ -186,7 +176,7 @@ public class ToolingTestUtils {
         try {
             Class<?> grpcCmdClass = Class.forName("io.ballerina.protoc.protobuf.cmd.GrpcCmd");
             GrpcCmd grpcCmd = (GrpcCmd) grpcCmdClass.getDeclaredConstructor().newInstance();
-            grpcCmd.setProtoPath(RESOURCE_DIRECTORY.toString() + FILE_SEPARATOR + PROTO_FILE_DIRECTORY + subDir);
+            grpcCmd.setProtoPath(RESOURCE_DIRECTORY + FILE_SEPARATOR + PROTO_FILE_DIRECTORY + subDir);
             grpcCmd.setBalOutPath(protocOutputDirPath.toAbsolutePath().toString());
             if (importDir != null) {
                 grpcCmd.setImportPath(Paths.get(RESOURCE_DIRECTORY.toString(), PROTO_FILE_DIRECTORY, importDir)
@@ -237,10 +227,10 @@ public class ToolingTestUtils {
     public static boolean hasSemanticDiagnostics(Path projectPath, boolean isSingleFile) {
         Package currentPackage;
         if (isSingleFile) {
-            SingleFileProject singleFileProject = SingleFileProject.load(getEnvironmentBuilder(), projectPath);
+            SingleFileProject singleFileProject = SingleFileProject.load(projectPath);
             currentPackage = singleFileProject.currentPackage();
         } else {
-            BuildProject buildProject = BuildProject.load(getEnvironmentBuilder(), projectPath);
+            BuildProject buildProject = BuildProject.load(projectPath);
             currentPackage = buildProject.currentPackage();
         }
         PackageCompilation compilation = currentPackage.getCompilation();
