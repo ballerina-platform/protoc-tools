@@ -253,7 +253,7 @@ public class ToolingCommonTest {
                 readContent(actualPath.resolve("messages2_pb.bal")));
     }
 
-    @Test(enabled = false)
+    @Test
     public void testNestedDirectoryWithPackageOption() {
         try {
             Files.createDirectories(Paths.get(GENERATED_SOURCES_DIRECTORY, "tool_test_packaging_nested_dirs"));

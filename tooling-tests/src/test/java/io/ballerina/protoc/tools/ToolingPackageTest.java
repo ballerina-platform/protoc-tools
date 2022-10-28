@@ -33,7 +33,7 @@ import static io.ballerina.protoc.tools.ToolingTestUtils.assertGeneratedSources;
  */
 public class ToolingPackageTest {
 
-    @Test(enabled = false)
+    @Test
     public void testSimplePackage() {
         try {
             Files.createDirectories(Paths.get(GENERATED_SOURCES_DIRECTORY, "tool_test_packaging_1"));
@@ -45,7 +45,7 @@ public class ToolingPackageTest {
                 "tool_test_packaging_1");
     }
 
-    @Test(enabled = false)
+    @Test
     public void testPackagingWithMessageImports() {
         try {
             Files.createDirectories(Paths.get(GENERATED_SOURCES_DIRECTORY, "tool_test_packaging_2"));
@@ -57,7 +57,7 @@ public class ToolingPackageTest {
                 "helloworld_client.bal", "tool_test_packaging_2", "modules/message/message_pb.bal");
     }
 
-    @Test(enabled = false)
+    @Test
     public void testPackagingWithMultipleImports() {
         try {
             Files.createDirectories(Paths.get(GENERATED_SOURCES_DIRECTORY, "tool_test_packaging_3"));
@@ -70,7 +70,7 @@ public class ToolingPackageTest {
                 "modules/message1/message1_pb.bal", "modules/message2/message2_pb.bal");
     }
 
-    @Test(enabled = false)
+    @Test
     public void testPackagingWithImportsContainingService() {
         try {
             Files.createDirectories(Paths.get(GENERATED_SOURCES_DIRECTORY, "tool_test_packaging_4"));
@@ -82,7 +82,7 @@ public class ToolingPackageTest {
                 "helloworld_client.bal", "tool_test_packaging_4", "modules/message/messageWithService_pb.bal");
     }
 
-    @Test(enabled = false)
+    @Test
     public void testPackagingWithNestedSubmodules() {
         try {
             Files.createDirectories(Paths.get(GENERATED_SOURCES_DIRECTORY, "tool_test_packaging_5"));
