@@ -15,11 +15,11 @@ rootProject.name = 'grpc'
 
 include ':checkstyle'
 include ':protoc-cli'
-include ':protoc-tools-tooling-tests'
+include ':tooling-tests'
 
 project(':checkstyle').projectDir = file("build-config${File.separator}checkstyle")
 project(':protoc-cli').projectDir = file('protoc-cli')
-project(':protoc-tools-tooling-tests').projectDir = file('tooling-tests')
+project(':tooling-tests').projectDir = file('tooling-tests')
 
 gradleEnterprise {
     buildScan {
