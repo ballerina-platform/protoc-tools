@@ -20,11 +20,12 @@ package io.ballerina.protoc.builder;
 import com.google.api.AnnotationsProto;
 import com.google.protobuf.DescriptorProtos;
 import com.google.protobuf.ExtensionRegistry;
-import io.ballerina.compiler.syntax.tree.SyntaxTree;
 import io.ballerina.projects.TomlDocument;
 import io.ballerina.protoc.builder.balgen.BalGenConstants;
+import io.ballerina.protoc.builder.model.SrcFilePojo;
 import io.ballerina.protoc.builder.stub.Descriptor;
 import io.ballerina.protoc.builder.stub.EnumMessage;
+import io.ballerina.protoc.builder.stub.GeneratorContext;
 import io.ballerina.protoc.builder.stub.Message;
 import io.ballerina.protoc.builder.stub.Method;
 import io.ballerina.protoc.builder.stub.ServiceFile;
@@ -45,8 +46,6 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PrintWriter;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -119,18 +118,20 @@ public class BallerinaFileBuilder {
         currentPackageName = Optional.ofNullable(getExistingPackageName(this.balOutPath));
     }
 
-    public void build(String mode) throws CodeBuilderException, CodeGeneratorException {
+    public List<SrcFilePojo> build(String mode, GeneratorContext generatorContext) throws CodeBuilderException,
+            CodeGeneratorException {
         // compute dependent descriptor source code.
         for (byte[] descriptorData : getDependentDescriptorSet(dependentDescriptors)) {
-            computeSourceContent(descriptorData, null, false);
+            computeSourceContent(descriptorData, null, false, generatorContext);
         }
         // compute root descriptor source code.
-        computeSourceContent(rootDescriptor.getDescriptor(), mode, true);
+        return computeSourceContent(rootDescriptor.getDescriptor(), mode, true, generatorContext);
     }
 
-    private void computeSourceContent(byte[] descriptor, String mode, boolean isRoot) throws CodeBuilderException,
-            CodeGeneratorException {
+    private List<SrcFilePojo> computeSourceContent(byte[] descriptor, String mode, boolean isRoot,
+                               GeneratorContext generatorContext) throws CodeBuilderException, CodeGeneratorException {
         Map<String, List<String>> unusedImports = new HashMap<>();
+        List<SrcFilePojo> sourceFiles = new ArrayList<>();
         if (rootDescriptor.getUnusedImports().size() > 0) {
             unusedImports.put(rootDescriptor.getProtoName(), rootDescriptor.getUnusedImports());
         }
@@ -146,7 +147,7 @@ public class BallerinaFileBuilder {
             if (fileDescriptorSet.getPackage().contains(GOOGLE_STANDARD_LIB) ||
                     fileDescriptorSet.getPackage().contains(GOOGLE_API_LIB) ||
                     fileDescriptorSet.getPackage().contains(BALLERINA_STANDARD_LIB)) {
-                return;
+                return sourceFiles;
             }
             List<DescriptorProtos.ServiceDescriptorProto> serviceDescriptorList = fileDescriptorSet.getServiceList();
             List<DescriptorProtos.DescriptorProto> messageTypeList = fileDescriptorSet.getMessageTypeList();
@@ -272,20 +273,18 @@ public class BallerinaFileBuilder {
                     String serviceFilePath = generateOutputFile(this.balOutPath,
                             serviceStub.getServiceName().toLowerCase() +
                                     BalGenConstants.SAMPLE_SERVICE_FILE_PREFIX);
-                    writeOutputFile(
-                            SyntaxTreeGenerator.generateSyntaxTreeForServiceSample(
-                                    serviceStub,
-                                    serviceIndex == 0,
-                                    stubFileObject.getFileName()
-                            ),
-                            serviceFilePath
-                    );
+                    sourceFiles.add(new SrcFilePojo(mode, serviceFilePath,
+                            Formatter.format(SyntaxTreeGenerator.generateSyntaxTreeForServiceSample(
+                            serviceStub,
+                            serviceIndex == 0,
+                            stubFileObject.getFileName()).toSourceCode())));
                 } else if (BalGenConstants.GRPC_CLIENT.equals(mode)) {
                     String clientFilePath = generateOutputFile(this.balOutPath,
                             serviceStub.getServiceName().toLowerCase() + BalGenConstants.SAMPLE_FILE_PREFIX
                     );
-                    writeOutputFile(generateSyntaxTreeForClientSample(serviceStub, filename, messageMap),
-                            clientFilePath);
+                    sourceFiles.add(new SrcFilePojo(mode, clientFilePath,
+                            Formatter.format(generateSyntaxTreeForClientSample(serviceStub, filename,
+                                    messageMap).toSourceCode())));
                 }
                 serviceIndex++;
             }
@@ -295,10 +294,14 @@ public class BallerinaFileBuilder {
                         "modules/" + moduleName.substring(moduleName.indexOf(PACKAGE_SEPARATOR) + 1) + "/" +
                                 filename + BalGenConstants.STUB_FILE_PREFIX);
             } else {
-                stubFilePath = generateOutputFile(this.balOutPath, filename + BalGenConstants.STUB_FILE_PREFIX);
+                stubFilePath = generateOutputFile(this.balOutPath, filename +
+                        BalGenConstants.STUB_FILE_PREFIX);
             }
-            writeOutputFile(SyntaxTreeGenerator.generateSyntaxTree(stubFileObject, isRoot, mode), stubFilePath);
-        } catch (IOException e) {
+            sourceFiles.add(new SrcFilePojo(mode, stubFilePath,
+                    Formatter.format(SyntaxTreeGenerator.generateSyntaxTree(stubFileObject, isRoot, mode,
+                            generatorContext).toSourceCode())));
+            return sourceFiles;
+        } catch (IOException | FormatterException e) {
             throw new CodeBuilderException("IO Error while reading proto file descriptor. " + e.getMessage(), e);
         }
     }
@@ -372,28 +375,6 @@ public class BallerinaFileBuilder {
             return file.getAbsolutePath();
         } catch (IOException e) {
             throw new CodeBuilderException("IO Error while creating output Ballerina files. " + e.getMessage(), e);
-        }
-    }
-
-    /**
-     * Write ballerina definition of a <code>syntaxTree</code> to a file.
-     *
-     * @param syntaxTree Syntax tree object representing the stub file
-     * @param outPath    Destination path for writing the resulting source file
-     * @throws CodeBuilderException when file operations fail
-     */
-    private static void writeOutputFile(SyntaxTree syntaxTree, String outPath)
-            throws CodeBuilderException {
-        String content;
-        try {
-            content = Formatter.format(syntaxTree.toSourceCode());
-        } catch (FormatterException e) {
-            throw new CodeBuilderException("Formatter Error while formatting output source code. " + e.getMessage(), e);
-        }
-        try (PrintWriter writer = new PrintWriter(outPath, StandardCharsets.UTF_8.name())) {
-            writer.println(content);
-        } catch (IOException e) {
-            throw new CodeBuilderException("IO Error while writing output to Ballerina file. " + e.getMessage(), e);
         }
     }
 

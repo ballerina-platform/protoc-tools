@@ -29,6 +29,7 @@ import io.ballerina.compiler.syntax.tree.Token;
 import io.ballerina.compiler.syntax.tree.TypeDescriptorNode;
 import io.ballerina.protoc.builder.balgen.BalGenConstants;
 import io.ballerina.protoc.builder.stub.EnumMessage;
+import io.ballerina.protoc.builder.stub.GeneratorContext;
 import io.ballerina.protoc.builder.stub.Message;
 import io.ballerina.protoc.builder.stub.Method;
 import io.ballerina.protoc.builder.stub.ServiceStub;
@@ -103,7 +104,8 @@ public class SyntaxTreeGenerator {
 
     }
 
-    public static SyntaxTree generateSyntaxTree(StubFile stubFile, boolean isRoot, String mode) {
+    public static SyntaxTree generateSyntaxTree(StubFile stubFile, boolean isRoot, String mode,
+                                                GeneratorContext generatorContext) {
         Set<String> ballerinaImports = new TreeSet<>();
         Set<String> protobufImports = new TreeSet<>();
         Set<String> grpcStreamImports = new TreeSet<>();
@@ -136,7 +138,13 @@ public class SyntaxTreeGenerator {
         java.util.Map<String, Type> valueTypeStreams = new LinkedHashMap<>();
 
         for (ServiceStub service : stubFile.getStubList()) {
-            Class client = new Class(service.getServiceName() + "Client", true);
+            Class client;
+            if (generatorContext == GeneratorContext.IDL_PLUGIN) {
+                client = new Class("'client", true);
+            } else {
+                client = new Class(service.getServiceName() + "Client", true);
+            }
+
             client.addQualifiers(new String[]{"isolated", "client"});
 
             client.addMember(getTypeReferenceNode(

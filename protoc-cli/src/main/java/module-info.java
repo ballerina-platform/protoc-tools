@@ -17,6 +17,11 @@
  */
 
 module io.ballerina.protoc {
+    exports io.ballerina.protoc.builder.model;
+    exports io.ballerina.protoc.protobuf;
+    exports io.ballerina.protoc.protobuf.cmd;
+    exports io.ballerina.protoc.protobuf.exception;
+    exports io.ballerina.protoc.builder.stub;
     requires proto.google.common.protos;
     requires io.ballerina.runtime;
     requires io.ballerina.lang;

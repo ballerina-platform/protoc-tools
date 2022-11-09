@@ -40,9 +40,16 @@ public class ProtocCommandBuilder {
     }
     
     public String build() {
-        return COMMAND_PLACEHOLDER.replace(EXE_PATH_PLACEHOLDER, exePath)
-                .replace(PROTO_PATH_PLACEHOLDER, protoPath)
-                .replace(DESC_PATH_PLACEHOLDER, descriptorSetOutPath)
-                .replace(PROTO_FOLDER_PLACEHOLDER, protoFolderPath);
+        if (exePath == null) {
+            return COMMAND_PLACEHOLDER.replace(EXE_PATH_PLACEHOLDER, "")
+                    .replace(PROTO_PATH_PLACEHOLDER, protoPath)
+                    .replace(DESC_PATH_PLACEHOLDER, descriptorSetOutPath)
+                    .replace(PROTO_FOLDER_PLACEHOLDER, protoFolderPath);
+        } else {
+            return COMMAND_PLACEHOLDER.replace(EXE_PATH_PLACEHOLDER, exePath)
+                    .replace(PROTO_PATH_PLACEHOLDER, protoPath)
+                    .replace(DESC_PATH_PLACEHOLDER, descriptorSetOutPath)
+                    .replace(PROTO_FOLDER_PLACEHOLDER, protoFolderPath);
+        }
     }
 }
