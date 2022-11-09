@@ -27,6 +27,11 @@ plugins {
 
 def packageName = "protoc"
 
+dependencies {
+    implementation project(':protoc-tool-idl-plugin')
+    implementation project(':protoc-cli')
+}
+
 allprojects {
     group = project.group
     version = project.version
@@ -117,6 +122,8 @@ task codeCoverageReport(type: JacocoReport) {
 def artifactCacheParent = file("$project.projectDir/build/cache_parent/")
 def artifactLibParent = file("$project.projectDir/build/lib_parent/")
 def targetProtocCliJar = file("$project.rootDir/protoc-cli/build/libs/protoc-cli-${project.version}.jar")
+def targetProtocIDLPluginJar = file("$project.rootDir/protoc-tool-idl-plugin/build/libs/" +
+        "protoc-tool-idl-plugin-${project.version}.jar")
 
 jar {
     manifest {
@@ -130,6 +137,10 @@ task directoryBuild {
     doLast {
         copy {
             from targetProtocCliJar
+            into file("$artifactLibParent/libs")
+        }
+        copy {
+            from targetProtocIDLPluginJar
             into file("$artifactLibParent/libs")
         }
     }
@@ -163,5 +174,13 @@ publishing {
 }
 
 directoryBuild.dependsOn ":${packageName}-cli:build"
+directoryBuild.dependsOn ":${packageName}-tool-idl-plugin:build"
+directoryBuild.dependsOn(compileJava)
+directoryBuild.dependsOn(compileTestJava)
+directoryBuild.dependsOn(jar)
+directoryBuild.dependsOn(processResources)
+directoryBuild.dependsOn(processTestResources)
+directoryBuild.dependsOn(spotbugsMain)
+directoryBuild.dependsOn(spotbugsTest)
 build.dependsOn directoryBuild
 
