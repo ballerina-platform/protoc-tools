@@ -25,4 +25,11 @@
             <package name="io.ballerina.protoc.tools.*"/>
         </packages>
     </test>
+
+    <test name="protoc-tools-idl-tests">
+        <classes>
+            <class name="io.ballerina.protoc.idl.client.IDLGenPluginTests"/>
+            <class name="io.ballerina.protoc.idl.client.IDLGenPluginNegativeTests"/>
+        </classes>
+    </test>
 </suite>

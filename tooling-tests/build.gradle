@@ -26,6 +26,10 @@ description = 'Ballerina - protoc-tools Tooling Test'
 
 def buildDir = "build";
 def ballerinaDist = "$project.buildDir/jballerina-tools-${ballerinaLangVersion}"
+def artifactLibParent = file("$project.rootDir/build/lib_parent/")
+// external jar file which need to pack to distribution
+def externalGoogleProtosCommonJar = file("$project.projectDir/src/test/resources/lib/proto-google-common-protos-${protoGoogleCommonsVersion}.jar")
+def externalProtobufJavaJar = file("$project.projectDir/src/test/resources/lib/protobuf-java-${protobufJavaVersion}.jar")
 
 configurations {
     balTools
@@ -38,6 +42,7 @@ dependencies {
     checkstyle project(':checkstyle')
     checkstyle "com.puppycrawl.tools:checkstyle:${checkstylePluginVersion}"
 
+    testImplementation group: 'org.apache.commons', name: 'commons-lang3', version: "${commonsLang3Version}"
     testImplementation group: 'org.ballerinalang', name: 'ballerina-runtime', version: "${ballerinaLangVersion}"
     testImplementation group: 'org.ballerinalang', name: 'ballerina-tools-api', version: "${ballerinaLangVersion}"
     testImplementation (group: 'org.ballerinalang', name: 'ballerina-cli', version: "${ballerinaLangVersion}") {
@@ -47,6 +52,7 @@ dependencies {
     testImplementation group: 'org.ballerinalang', name: 'ballerina-tools-api', version: "${ballerinaLangVersion}"
     testImplementation group: 'org.ballerinalang', name: 'ballerina-parser', version: "${ballerinaLangVersion}"
     testImplementation project(":protoc-cli")
+    testImplementation project(":protoc-tool-idl-plugin")
     testImplementation group: 'org.testng', name: 'testng', version: "${testngVersion}"
 
     balTools ("org.ballerinalang:jballerina-tools:${ballerinaLangVersion}") {
@@ -107,6 +113,7 @@ checkstyle {
 checkstyleTest.dependsOn(":checkstyle:downloadCheckstyleRuleFiles")
 
 spotbugsTest {
+    enabled false
     effort "max"
     reportLevel "low"
     reportsDir = file("$project.buildDir/reports/spotbugs")
@@ -128,10 +135,36 @@ checkstyleMain {
     enabled false
 }
 
+task copyJar(type: Copy) {
+    from "$project.rootDir/protoc-tool-idl-plugin/build/libs/protoc-tool-idl-plugin-${version}.jar"
+    into "$ballerinaDist/bre/lib"
+
+    from "$project.rootDir/protoc-cli/build/libs/protoc-cli-${version}.jar"
+    into "$ballerinaDist/bre/lib"
+}
+
+task copyExternalJars {
+    doLast {
+        copy {
+            from externalProtobufJavaJar
+            into file("$artifactLibParent/libs")
+            into "$ballerinaDist/bre/lib"
+        }
+        copy {
+            from externalGoogleProtosCommonJar
+            into file("$artifactLibParent/libs")
+            into "$ballerinaDist/bre/lib"
+        }
+    }
+}
+
 test {
     dependsOn(copyStdlibs)
-    systemProperty "ballerina.home", ballerinaDist
-    systemProperty "ballerina.offline.flag", "true"
+    systemProperties = [ "ballerina.home": ballerinaDist,
+                         "ballerina.offline.flag": "true",
+                         "target.dir": "$project.buildDir",
+                         "ballerina.version": "jballerina-tools-${ballerinaLangVersion}"
+    ]
     useTestNG() {
         suites 'src/test/resources/testng.xml'
     }
@@ -172,4 +205,8 @@ compileJava {
     }
 }
 
-test.dependsOn ":protoc-cli:build"
+copyJar.dependsOn ":protoc-tool-idl-plugin:build"
+copyJar.dependsOn ":protoc-cli:build"
+copyJar.dependsOn ":protoc-tool-idl-plugin:shadowJar"
+test.dependsOn copyJar
+test.dependsOn copyExternalJars

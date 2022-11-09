@@ -3,10 +3,9 @@ package io.ballerina.protoc.idl.client;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import java.io.File;
 import java.io.IOException;
 
-import static io.ballerina.protoc.idl.client.TestUtils.getMatchingFiles;
+import static io.ballerina.protoc.idl.client.TestUtils.checkModuleAvailability;
 
 /**
  * Client IDL import integration tests.
@@ -16,19 +15,16 @@ import static io.ballerina.protoc.idl.client.TestUtils.getMatchingFiles;
 public class IDLGenPluginNegativeTests {
     @Test(description = "Proto directory configuration")
     public void testProtoDirConfiguration() throws IOException, InterruptedException {
-        File[] matchingFiles = getMatchingFiles("project_03");
-        Assert.assertNull(matchingFiles);
+        Assert.assertFalse(checkModuleAvailability("project_03"));
     }
 
-    @Test(description = "Remote proto file configuration")
+    @Test(description = "Remote proto file configuration", enabled = false)
     public void testRemoteProtoDefinition() throws IOException, InterruptedException {
-        File[] matchingFiles = getMatchingFiles("project_04");
-        Assert.assertNull(matchingFiles);
+        Assert.assertFalse(checkModuleAvailability("project_04"));
     }
 
-    @Test(description = "invalid proto file name")
+    @Test(description = "invalid proto file name", enabled = false)
     public void testInvalidProtoFileName() throws IOException, InterruptedException {
-        File[] matchingFiles = getMatchingFiles("project_08");
-        Assert.assertNull(matchingFiles);
+        Assert.assertFalse(checkModuleAvailability("project_05"));
     }
 }

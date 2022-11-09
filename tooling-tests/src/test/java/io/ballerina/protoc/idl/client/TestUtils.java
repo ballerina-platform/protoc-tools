@@ -28,15 +28,22 @@ public class TestUtils {
     public static final String DISTRIBUTION_FILE_NAME = System.getProperty("ballerina.version");
     private static String balFile = "bal";
 
-    public static File[] getMatchingFiles(String project) throws IOException, InterruptedException {
-        List<String> buildArgs = new LinkedList<>();
-
-        boolean successful = executeRun(DISTRIBUTION_FILE_NAME, RESOURCE.resolve(project), buildArgs);
+    public static boolean checkModuleAvailability(String project) throws IOException, InterruptedException {
+        Process process = executeRun(RESOURCE.resolve(project));
         File dir = new File(new File(String.valueOf(RESOURCE.resolve(project).resolve("generated"))).toString());
-        final String id = "grpc_client";
+        return dir.exists();
+    }
+
+    public static File[] getMatchingFiles(String project, List<String> ids) {
+        File dir = new File(RESOURCE.resolve(project + "/generated/").toString());
         File[] matchingFiles = dir.listFiles(new FileFilter() {
             public boolean accept(File pathname) {
-                return pathname.getName().contains(id);
+                for (String id : ids) {
+                    if (pathname.getName().contains(id)) {
+                        return true;
+                    }
+                }
+                return false;
             }
         });
         return matchingFiles;
@@ -45,31 +52,29 @@ public class TestUtils {
     /**
      * Execute Ballerina run command.
      */
-    public static boolean executeRun(String distributionName, Path sourceDirectory,
-                                     List<String> args) throws IOException, InterruptedException {
+    public static Process executeRun(Path sourceDirectory)
+            throws IOException, InterruptedException {
+        List<String> args = new LinkedList<>();
         args.add(0, "run");
-        Process process = getProcessBuilderResults(distributionName, sourceDirectory, args);
-        int exitCode = process.waitFor();
-        logOutput(process.getInputStream());
-        logOutput(process.getErrorStream());
-        return exitCode == 0;
+        Process process = getProcessBuilderResults(sourceDirectory, args);
+        process.waitFor();
+        return process;
     }
 
     /**
      *  Get Process from given arguments.
-     * @param distributionName The name of the distribution.
      * @param sourceDirectory  The directory where the sources files are location.
      * @param args             The arguments to be passed to the build command.
      * @return process
      * @throws IOException          Error executing build command.
      */
-    public static Process getProcessBuilderResults(String distributionName, Path sourceDirectory, List<String> args)
+    public static Process getProcessBuilderResults(Path sourceDirectory, List<String> args)
             throws IOException {
 
         if (System.getProperty("os.name").startsWith("Windows")) {
             balFile = "bal.bat";
         }
-        args.add(0, TEST_DISTRIBUTION_PATH.resolve(distributionName).resolve("bin").resolve(balFile).toString());
+        args.add(0, TEST_DISTRIBUTION_PATH.resolve("bin").resolve(balFile).toString());
         OUT.println("Executing: " + StringUtils.join(args, ' '));
         ProcessBuilder pb = new ProcessBuilder(args);
         pb.directory(sourceDirectory.toFile());
