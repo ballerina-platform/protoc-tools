@@ -46,19 +46,18 @@ public class ProtocToolIDLPlugin extends IDLGeneratorPlugin {
 
         @Override
         public void perform(IDLSourceGeneratorContext idlSourceGeneratorContext) {
-            String moduleName = "grpc_client";
             try {
                 GrpcCmd grpcCmd = new GrpcCmd();
                 List<SrcFilePojo> genSrcFiles = grpcCmd.generateBalFile(
                         idlSourceGeneratorContext.resourcePath().toString(), "", null, null, "3.21.7", "stub",
                         GeneratorContext.IDL_PLUGIN);
+                String moduleName = idlSourceGeneratorContext.clientNode().clientPrefix().text();
                 ModuleId moduleId = ModuleId.create(moduleName, idlSourceGeneratorContext.currentPackage().packageId());
                 LinkedList<DocumentConfig> documents = new LinkedList<>();
-
                 genSrcFiles.forEach(genSrcFile -> {
                     DocumentId documentId = DocumentId.create(genSrcFile.getFileName(), moduleId);
                     DocumentConfig documentConfig = DocumentConfig.from(
-                            documentId, genSrcFile.getContent(), genSrcFile.getFileName());
+                            documentId, genSrcFile.getContent(), Utils.extractStubFileName(genSrcFile.getFileName()));
                     documents.add(documentConfig);
                 });
 

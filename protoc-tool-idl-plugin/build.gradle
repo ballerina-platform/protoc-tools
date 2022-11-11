@@ -18,6 +18,13 @@
 plugins {
     id 'java'
     id 'checkstyle'
+    id 'com.github.johnrengelman.shadow'
+}
+
+configurations {
+    dist {
+        transitive true
+    }
 }
 
 group 'io.ballerina'
@@ -43,8 +50,24 @@ dependencies {
     implementation group: 'com.google.protobuf', name: 'protobuf-java', version: "${protobufJavaVersion}"
 }
 
+jar {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    dependsOn configurations.dist
+    from { configurations.dist.collect { it.isDirectory() ? it : zipTree(it) } } {
+        exclude 'META-INF/*.RSA', 'META-INF/*.SF', 'META-INF/*.DSA'
+    }
+    def libraries = ['protobuf-java']
+    from configurations.runtimeClasspath.
+            findAll { libraries.contains(it.name)}.
+            collect { zipTree(it) }
+}
+
+build.dependsOn(shadowJar)
+
 test {
-    useJUnitPlatform()
+    useTestNG() {
+        suites "src/test/resources/testng.xml"
+    }
 }
 
 jacoco {

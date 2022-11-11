@@ -28,11 +28,12 @@ def buildDir = "build";
 def ballerinaDist = "$project.buildDir/jballerina-tools-${ballerinaLangVersion}"
 def artifactLibParent = file("$project.rootDir/build/lib_parent/")
 // external jar file which need to pack to distribution
-def externalGoogleProtosCommonJar = file("$project.projectDir/src/test/resources/lib/proto-google-common-protos-${protoGoogleCommonsVersion}.jar")
-def externalProtobufJavaJar = file("$project.projectDir/src/test/resources/lib/protobuf-java-${protobufJavaVersion}.jar")
+def externalGoogleProtosCommonJar = file("$project.projectDir/lib/proto-google-common-protos-${protoGoogleCommonsVersion}.jar")
+def externalProtobufJavaJar = file("$project.projectDir/lib/protobuf-java-${protobufJavaVersion}.jar")
 
 configurations {
     balTools
+    externalJars
     dist {
         transitive true
     }
@@ -56,6 +57,13 @@ dependencies {
     testImplementation group: 'org.testng', name: 'testng', version: "${testngVersion}"
 
     balTools ("org.ballerinalang:jballerina-tools:${ballerinaLangVersion}") {
+        transitive = false
+    }
+
+    externalJars(group: 'com.google.protobuf', name: 'protobuf-java', version: "${protobufJavaVersion}") {
+        transitive = false
+    }
+    externalJars(group: 'com.google.api.grpc', name: 'proto-google-common-protos', version: "${protoGoogleCommonsVersion}") {
         transitive = false
     }
 }
@@ -145,6 +153,10 @@ task copyJar(type: Copy) {
 
 task copyExternalJars {
     doLast {
+        copy {
+            into "$project.projectDir/lib"
+            from project.configurations.externalJars
+        }
         copy {
             from externalProtobufJavaJar
             into file("$artifactLibParent/libs")

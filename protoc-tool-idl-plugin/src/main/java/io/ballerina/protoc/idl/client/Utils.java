@@ -37,4 +37,9 @@ public class Utils {
         Diagnostic diagnostic = DiagnosticFactory.createDiagnostic(diagnosticInfo, location);
         context.reportDiagnostic(diagnostic);
     }
+
+    public static String extractStubFileName(String absoluteStubPath) {
+        String[] pathElements = absoluteStubPath.strip().split(System.getProperty("file.separator"));
+        return pathElements[pathElements.length - 1];
+    }
 }
