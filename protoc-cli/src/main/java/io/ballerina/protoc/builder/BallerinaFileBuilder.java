@@ -49,6 +49,7 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -120,12 +121,14 @@ public class BallerinaFileBuilder {
 
     public List<SrcFilePojo> build(String mode, GeneratorContext generatorContext) throws CodeBuilderException,
             CodeGeneratorException {
+        List<List<SrcFilePojo>> packageSrcFiles = new ArrayList<>();
         // compute dependent descriptor source code.
         for (byte[] descriptorData : getDependentDescriptorSet(dependentDescriptors)) {
-            computeSourceContent(descriptorData, null, false, generatorContext);
+            packageSrcFiles.add(computeSourceContent(descriptorData, null, false, generatorContext));
         }
         // compute root descriptor source code.
-        return computeSourceContent(rootDescriptor.getDescriptor(), mode, true, generatorContext);
+        packageSrcFiles.add(computeSourceContent(rootDescriptor.getDescriptor(), mode, true, generatorContext));
+        return packageSrcFiles.stream().flatMap(Collection::stream).collect(Collectors.toList());
     }
 
     private List<SrcFilePojo> computeSourceContent(byte[] descriptor, String mode, boolean isRoot,

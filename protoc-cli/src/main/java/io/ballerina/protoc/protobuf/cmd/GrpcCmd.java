@@ -137,7 +137,7 @@ public class GrpcCmd implements BLauncherCmd {
             return;
         }
 
-        List<SrcFilePojo> genSrcFiles = new ArrayList<>();
+        List<List<SrcFilePojo>> genSrcFiles = new ArrayList<>();
         if (protoPath.endsWith("**.proto") || new File(protoPath).isDirectory()) {
             // Multiple proto files
             List<String> protoFiles;
@@ -156,8 +156,8 @@ public class GrpcCmd implements BLauncherCmd {
             } else {
                 for (String protoFile : protoFiles) {
                     try {
-                        genSrcFiles = generateBalFile(protoFile, importPath, balOutPath, protocExePath, protocVersion,
-                                mode, GeneratorContext.CLI);
+                        genSrcFiles.add(generateBalFile(protoFile, importPath, balOutPath, protocExePath, protocVersion,
+                                mode, GeneratorContext.CLI));
                     } catch (Exception e) {
                         outStream.println(e.getMessage());
                     }
@@ -173,8 +173,8 @@ public class GrpcCmd implements BLauncherCmd {
                 return;
             }
             try {
-                genSrcFiles = generateBalFile(protoPath, importPath, balOutPath, protocExePath, protocVersion, mode,
-                        GeneratorContext.CLI);
+                genSrcFiles.add(generateBalFile(protoPath, importPath, balOutPath, protocExePath, protocVersion, mode,
+                        GeneratorContext.CLI));
             } catch (Exception e) {
                 outStream.println(e.getMessage());
             }
@@ -204,15 +204,17 @@ public class GrpcCmd implements BLauncherCmd {
                 .collect(Collectors.toList());
     }
 
-    private static void writeOutputFile(List<SrcFilePojo> genSrcFiles) throws CodeBuilderException {
-
-        for (SrcFilePojo genSrcFile : genSrcFiles) {
-            try (PrintWriter writer = new PrintWriter(genSrcFile.getFileName(), StandardCharsets.UTF_8.name())) {
-                writer.println(genSrcFile.getContent());
-                outStream.println("Successfully generated the Ballerina file." +
-                        BalGenerationConstants.NEW_LINE_CHARACTER);
-            } catch (IOException e) {
-                throw new CodeBuilderException("IO Error while writing output to Ballerina file. " + e.getMessage(), e);
+    private static void writeOutputFile(List<List<SrcFilePojo>> genSrcFiles) throws CodeBuilderException {
+        for (List<SrcFilePojo> genFilesPerProto : genSrcFiles) {
+            for (SrcFilePojo genSrcFile : genFilesPerProto) {
+                try (PrintWriter writer = new PrintWriter(genSrcFile.getFileName(), StandardCharsets.UTF_8.name())) {
+                    writer.println(genSrcFile.getContent());
+                    outStream.println("Successfully generated the Ballerina file." +
+                            BalGenerationConstants.NEW_LINE_CHARACTER);
+                } catch (IOException e) {
+                    throw new CodeBuilderException("IO Error while writing output to Ballerina file. " +
+                            e.getMessage(), e);
+                }
             }
         }
     }
