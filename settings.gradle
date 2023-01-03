@@ -11,7 +11,7 @@ plugins {
     id "com.gradle.enterprise" version "3.2"
 }
 
-rootProject.name = 'grpc'
+rootProject.name = 'protoc-tools'
 
 include ':checkstyle'
 include ':protoc-cli'
