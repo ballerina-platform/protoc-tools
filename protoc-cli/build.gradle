@@ -29,6 +29,9 @@ repositories {
 configurations {
     implementation
     externalJars
+    dist {
+        transitive true
+    }
 }
 
 dependencies {
@@ -50,7 +53,18 @@ dependencies {
     implementation group: 'com.google.protobuf', name: 'protobuf-java', version: "${protobufJavaVersion}"
     implementation group: 'info.picocli', name: 'picocli', version: "${picocliVersion}"
 
+    dist "com.google.protobuf:protobuf-java:${protobufJavaVersion}"
+    dist "com.google.api.grpc:proto-google-common-protos:${protoGoogleCommonsVersion}"
+
     testImplementation group: 'org.testng', name: 'testng', version: "${testngVersion}"
+}
+
+jar {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    dependsOn configurations.dist
+    from { configurations.dist.collect { it.isDirectory() ? it : zipTree(it) } } {
+        exclude 'META-INF/*.RSA', 'META-INF/*.SF', 'META-INF/*.DSA'
+    }
 }
 
 test {
