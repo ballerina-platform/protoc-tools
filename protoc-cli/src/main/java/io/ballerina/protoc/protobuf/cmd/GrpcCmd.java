@@ -475,8 +475,4 @@ public class GrpcCmd implements BLauncherCmd {
     public void setImportPath(String importPath) {
         this.importPath = importPath;
     }
-
-    public void setHelpFlag(boolean helpFlag) {
-        this.helpFlag = helpFlag;
-    }
 }
