@@ -76,7 +76,7 @@ public class GrpcCmd implements BLauncherCmd {
 
     private CommandLine parentCmdParser;
 
-    @CommandLine.Option(names = {"-h", "--help"}, hidden = true)
+    @CommandLine.Option(names = {"-h", "--help"}, hidden = true, usageHelp = true)
     private boolean helpFlag;
 
     @CommandLine.Option(names = {"--input"}, description = "Input .proto file or a directory containing " +
