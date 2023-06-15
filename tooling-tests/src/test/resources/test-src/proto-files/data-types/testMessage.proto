@@ -22,6 +22,7 @@ import "google/protobuf/timestamp.proto";
 import "google/protobuf/any.proto";
 import "google/protobuf/struct.proto";
 import "google/protobuf/duration.proto";
+import "google/protobuf/wrappers.proto";
 
 message Test1 {
     string name = 1;
@@ -63,4 +64,16 @@ message Test5 {
     repeated google.protobuf.Any anyDetails = 2;
     repeated google.protobuf.Struct structDetails = 3;
     repeated google.protobuf.Duration durationDetails = 4;
+}
+
+message Test6 {
+    google.protobuf.StringValue a = 1;
+    google.protobuf.Int32Value b = 2;
+    google.protobuf.UInt32Value c = 3;
+    google.protobuf.Int64Value d = 4;
+    google.protobuf.UInt64Value e = 5;
+    google.protobuf.DoubleValue f = 6;
+    google.protobuf.FloatValue g = 7;
+    google.protobuf.BoolValue h = 8;
+    google.protobuf.BytesValue i = 9;
 }

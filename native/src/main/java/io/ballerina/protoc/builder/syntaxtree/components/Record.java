@@ -177,16 +177,20 @@ public class Record {
         ExpressionNode expressionNode;
         switch (fieldType) {
             case "int":
-                expressionNode = getNumericLiteralNode(Integer.parseInt(defaultValue));
+                expressionNode = defaultValue != null ? getNumericLiteralNode(Integer.parseInt(defaultValue)) :
+                        getNumericLiteralNode(0);
                 break;
             case "float":
-                expressionNode = getNumericLiteralNode(Float.parseFloat(defaultValue));
+                expressionNode = defaultValue != null ? getNumericLiteralNode(Float.parseFloat(defaultValue)) :
+                        getNumericLiteralNode(0);
                 break;
             case "boolean":
-                expressionNode = getBooleanLiteralNode(Boolean.parseBoolean(defaultValue));
+                expressionNode = defaultValue != null ? getBooleanLiteralNode(Boolean.parseBoolean(defaultValue)) :
+                        getBooleanLiteralNode(false);
                 break;
             default:
-                expressionNode = getStringLiteralNode(defaultValue);
+                expressionNode = defaultValue != null ?  getStringLiteralNode(defaultValue) :
+                        getStringLiteralNode("");
         }
         fields = fields.add(
                 NodeFactory.createRecordFieldWithDefaultValueNode(

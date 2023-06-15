@@ -25,6 +25,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import static io.ballerina.protoc.builder.balgen.BalGenerationUtils.getMappingBalType;
+
 /**
  * Message Definition bean class.
  *
@@ -150,7 +152,10 @@ public class Message {
             for (DescriptorProtos.FieldDescriptorProto fieldDescriptorProto : messageDescriptor.getFieldList()) {
                 Field field;
                 if (isWellKnownProtoType((fieldDescriptorProto.getTypeName()))) {
-                    field = Field.newBuilder(fieldDescriptorProto).build();
+                    field = Field.newBuilder(
+                            fieldDescriptorProto,
+                            getMappingBalType(fieldDescriptorProto.getTypeName())
+                    ).build();
                 } else {
                     field = Field.newBuilder(
                             fieldDescriptorProto,
