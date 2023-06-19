@@ -39,6 +39,7 @@ import io.ballerina.protoc.builder.syntaxtree.components.Constant;
 import io.ballerina.protoc.builder.syntaxtree.components.Function;
 import io.ballerina.protoc.builder.syntaxtree.components.Imports;
 import io.ballerina.protoc.builder.syntaxtree.components.Listener;
+import io.ballerina.protoc.builder.syntaxtree.components.Map;
 import io.ballerina.protoc.builder.syntaxtree.components.Service;
 import io.ballerina.protoc.builder.syntaxtree.components.Type;
 import io.ballerina.protoc.builder.syntaxtree.constants.SyntaxTreeConstants;
@@ -54,18 +55,23 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import static io.ballerina.protoc.GrpcConstants.ORG_NAME;
+import static io.ballerina.protoc.GrpcConstants.REGEX_DOT_SEPERATOR;
 import static io.ballerina.protoc.MethodDescriptor.MethodType.BIDI_STREAMING;
 import static io.ballerina.protoc.MethodDescriptor.MethodType.CLIENT_STREAMING;
 import static io.ballerina.protoc.MethodDescriptor.MethodType.SERVER_STREAMING;
 import static io.ballerina.protoc.builder.BallerinaFileBuilder.dependentValueTypeMap;
 import static io.ballerina.protoc.builder.BallerinaFileBuilder.protofileModuleMap;
 import static io.ballerina.protoc.builder.BallerinaFileBuilder.streamClassMap;
+import static io.ballerina.protoc.builder.balgen.BalGenConstants.COLON;
+import static io.ballerina.protoc.builder.balgen.BalGenConstants.PACKAGE_SEPARATOR;
 import static io.ballerina.protoc.builder.syntaxtree.components.Expression.getCheckExpressionNode;
 import static io.ballerina.protoc.builder.syntaxtree.components.Expression.getFieldAccessExpressionNode;
 import static io.ballerina.protoc.builder.syntaxtree.components.Expression.getImplicitNewExpressionNode;
 import static io.ballerina.protoc.builder.syntaxtree.components.Expression.getMethodCallExpressionNode;
+import static io.ballerina.protoc.builder.syntaxtree.components.Literal.getStringLiteralNode;
 import static io.ballerina.protoc.builder.syntaxtree.components.Statement.getCallStatementNode;
 import static io.ballerina.protoc.builder.syntaxtree.components.TypeDescriptor.getErrorTypeDescriptorNode;
+import static io.ballerina.protoc.builder.syntaxtree.components.TypeDescriptor.getMapTypeDescriptorNode;
 import static io.ballerina.protoc.builder.syntaxtree.components.TypeDescriptor.getObjectFieldNode;
 import static io.ballerina.protoc.builder.syntaxtree.components.TypeDescriptor.getOptionalTypeDescriptorNode;
 import static io.ballerina.protoc.builder.syntaxtree.components.TypeDescriptor.getQualifiedNameReferenceNode;
@@ -83,6 +89,7 @@ import static io.ballerina.protoc.builder.syntaxtree.utils.CommonUtils.addSubMod
 import static io.ballerina.protoc.builder.syntaxtree.utils.CommonUtils.addTimeImportsIfExists;
 import static io.ballerina.protoc.builder.syntaxtree.utils.CommonUtils.getProtobufType;
 import static io.ballerina.protoc.builder.syntaxtree.utils.CommonUtils.isBallerinaProtobufType;
+import static io.ballerina.protoc.builder.syntaxtree.utils.CommonUtils.removeStandardImports;
 import static io.ballerina.protoc.builder.syntaxtree.utils.EnumUtils.getEnum;
 import static io.ballerina.protoc.builder.syntaxtree.utils.MessageUtils.getMessageNodes;
 import static io.ballerina.protoc.builder.syntaxtree.utils.ServerUtils.getServerStreamClass;
@@ -119,9 +126,20 @@ public class SyntaxTreeGenerator {
                 "public ",
                 "string",
                 descriptorName,
-                stubFile.getRootDescriptor() == null ? "" : stubFile.getRootDescriptor()
+                getStringLiteralNode(stubFile.getRootDescriptor() == null ? "" : stubFile.getRootDescriptor())
         );
         moduleMembers = moduleMembers.add(descriptor.getConstantDeclarationNode());
+
+        if (isRoot) {
+            Constant descriptorMap = new Constant(
+                    "public ",
+                    getMapTypeDescriptorNode(SYNTAX_TREE_VAR_STRING),
+                    "descriptorMap",
+                    generateDescMap(removeStandardImports(stubFile.getImportList()))
+                            .getMappingConstructorExpressionNode()
+            );
+            moduleMembers = moduleMembers.add(descriptorMap.getConstantDeclarationNode());
+        }
 
         if (stubFile.getMessageMap().size() > 0) {
             ballerinaImports.add("protobuf");
@@ -250,6 +268,21 @@ public class SyntaxTreeGenerator {
         return stubFilename.toUpperCase() + ROOT_DESCRIPTOR;
     }
 
+    private static Map generateDescMap(List<String> importList) {
+        Map descMap = new Map();
+        for (String filename: importList) {
+            String importDescName = generateDescriptorName(filename.split(REGEX_DOT_SEPERATOR)[0]);
+            String protoFileName = filename.substring(0, filename.lastIndexOf(PACKAGE_SEPARATOR));
+            if (protofileModuleMap.containsKey(protoFileName)) {
+                String subModuleName = protofileModuleMap.get(protoFileName);
+                importDescName = subModuleName.substring(subModuleName.lastIndexOf(PACKAGE_SEPARATOR) + 1) + COLON
+                        + importDescName;
+            }
+            descMap.addField("\"" + filename + "\"", getSimpleNameReferenceNode(importDescName));
+        }
+        return descMap;
+    }
+
     public static SyntaxTree generateSyntaxTreeForServiceSample(ServiceStub serviceStub, boolean addListener,
                                                                 String fileName) {
         NodeList<ModuleMemberDeclarationNode> moduleMembers = AbstractNodeFactory.createEmptyNodeList();
@@ -285,6 +318,10 @@ public class SyntaxTreeGenerator {
         grpcServiceDescriptor.addField(
                 "value",
                 generateDescriptorName(fileName)
+        );
+        grpcServiceDescriptor.addField(
+                "descMap",
+                "descriptorMap"
         );
         service.addAnnotation(grpcServiceDescriptor.getAnnotationNode());
 
@@ -364,7 +401,8 @@ public class SyntaxTreeGenerator {
                                         getFieldAccessExpressionNode("self", "grpcClient"),
                                         "initStub",
                                         "self",
-                                        generateDescriptorName(fileName))
+                                        generateDescriptorName(fileName),
+                                        "descriptorMap")
                         )
                 )
         );
