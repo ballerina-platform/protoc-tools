@@ -95,4 +95,17 @@ public class ToolingPackageTest {
                 "modules/messages.message1/message1_pb.bal", "modules/messages.message2/message2_pb.bal");
     }
 
+    @Test
+    public void testPackagingWithEnumImports() {
+        try {
+            Files.createDirectories(Paths.get(GENERATED_SOURCES_DIRECTORY, "tool_test_packaging_with_enum_imports"));
+        } catch (IOException e) {
+            Assert.fail("Could not create target directories", e);
+        }
+        assertGeneratedSources("packaging", "packages_with_enum_imports/packageWithEnumImports.proto",
+                "packageWithEnumImports_pb.bal", "helloworld_service.bal",
+                "helloworld_client.bal", "tool_test_packaging_with_enum_imports",
+                "modules/messages/enumMessage_pb.bal");
+    }
+
 }
