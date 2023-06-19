@@ -54,6 +54,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
+import static io.ballerina.protoc.GrpcConstants.DESCRIPTOR_MAP;
 import static io.ballerina.protoc.GrpcConstants.ORG_NAME;
 import static io.ballerina.protoc.GrpcConstants.REGEX_DOT_SEPERATOR;
 import static io.ballerina.protoc.MethodDescriptor.MethodType.BIDI_STREAMING;
@@ -89,7 +90,6 @@ import static io.ballerina.protoc.builder.syntaxtree.utils.CommonUtils.addSubMod
 import static io.ballerina.protoc.builder.syntaxtree.utils.CommonUtils.addTimeImportsIfExists;
 import static io.ballerina.protoc.builder.syntaxtree.utils.CommonUtils.getProtobufType;
 import static io.ballerina.protoc.builder.syntaxtree.utils.CommonUtils.isBallerinaProtobufType;
-import static io.ballerina.protoc.builder.syntaxtree.utils.CommonUtils.removeStandardImports;
 import static io.ballerina.protoc.builder.syntaxtree.utils.EnumUtils.getEnum;
 import static io.ballerina.protoc.builder.syntaxtree.utils.MessageUtils.getMessageNodes;
 import static io.ballerina.protoc.builder.syntaxtree.utils.ServerUtils.getServerStreamClass;
@@ -110,7 +110,8 @@ public class SyntaxTreeGenerator {
 
     }
 
-    public static SyntaxTree generateSyntaxTree(StubFile stubFile, boolean isRoot, String mode) {
+    public static SyntaxTree generateSyntaxTree(StubFile stubFile, boolean isRoot, String mode,
+                                                List<String> fileImports) {
         Set<String> ballerinaImports = new TreeSet<>();
         Set<String> protobufImports = new TreeSet<>();
         Set<String> grpcStreamImports = new TreeSet<>();
@@ -130,13 +131,12 @@ public class SyntaxTreeGenerator {
         );
         moduleMembers = moduleMembers.add(descriptor.getConstantDeclarationNode());
 
-        if (isRoot) {
+        if (isRoot && fileImports.size() > 0) {
             Constant descriptorMap = new Constant(
                     "public ",
                     getMapTypeDescriptorNode(SYNTAX_TREE_VAR_STRING),
-                    "descriptorMap",
-                    generateDescMap(removeStandardImports(stubFile.getImportList()))
-                            .getMappingConstructorExpressionNode()
+                    DESCRIPTOR_MAP,
+                    generateDescMap(fileImports).getMappingConstructorExpressionNode()
             );
             moduleMembers = moduleMembers.add(descriptorMap.getConstantDeclarationNode());
         }
@@ -162,7 +162,8 @@ public class SyntaxTreeGenerator {
                     getQualifiedNameReferenceNode("grpc", "AbstractClientEndpoint")));
             client.addMember(getObjectFieldNode("private", new String[]{"final"},
                     getQualifiedNameReferenceNode("grpc", "Client"), "grpcClient"));
-            client.addMember(getInitFunction(stubFile.getFileName()).getFunctionDefinitionNode());
+            client.addMember(getInitFunction(stubFile.getFileName(), fileImports.size() > 0)
+                    .getFunctionDefinitionNode());
 
             for (Method method : service.getUnaryFunctions()) {
                 client.addMember(UnaryUtils.getUnaryFunction(method, stubFile.getFileName())
@@ -284,7 +285,7 @@ public class SyntaxTreeGenerator {
     }
 
     public static SyntaxTree generateSyntaxTreeForServiceSample(ServiceStub serviceStub, boolean addListener,
-                                                                String fileName) {
+                                                                String fileName, List<String> fileImports) {
         NodeList<ModuleMemberDeclarationNode> moduleMembers = AbstractNodeFactory.createEmptyNodeList();
         NodeList<ImportDeclarationNode> imports = NodeFactory.createEmptyNodeList();
         ImportDeclarationNode importForGrpc = Imports.getImportDeclarationNode("ballerina", "grpc");
@@ -304,7 +305,7 @@ public class SyntaxTreeGenerator {
             Listener listener = new Listener(
                     "ep",
                     getQualifiedNameReferenceNode("grpc", "Listener"),
-                    getImplicitNewExpressionNode(new String[]{"9090"}),
+                    getImplicitNewExpressionNode("9090"),
                     false
             );
             moduleMembers = moduleMembers.add(listener.getListenerDeclarationNode());
@@ -319,10 +320,12 @@ public class SyntaxTreeGenerator {
                 "value",
                 generateDescriptorName(fileName)
         );
-        grpcServiceDescriptor.addField(
-                "descMap",
-                "descriptorMap"
-        );
+        if (fileImports.size() > 0) {
+            grpcServiceDescriptor.addField(
+                    "descMap",
+                    DESCRIPTOR_MAP
+            );
+        }
         service.addAnnotation(grpcServiceDescriptor.getAnnotationNode());
 
         for (Method method : methodList) {
@@ -380,7 +383,7 @@ public class SyntaxTreeGenerator {
         return syntaxTree.modifyWith(modulePartNode);
     }
 
-    public static Function getInitFunction(String fileName) {
+    public static Function getInitFunction(String fileName, boolean addDescMap) {
         Function function = new Function("init");
         function.addRequiredParameter(SYNTAX_TREE_VAR_STRING, "url");
         function.addIncludedRecordParameter(
@@ -400,12 +403,9 @@ public class SyntaxTreeGenerator {
                                 getMethodCallExpressionNode(
                                         getFieldAccessExpressionNode("self", "grpcClient"),
                                         "initStub",
-                                        "self",
-                                        generateDescriptorName(fileName),
-                                        "descriptorMap")
-                        )
-                )
-        );
+                                        addDescMap ? new String[] {"self",
+                                                generateDescriptorName(fileName), DESCRIPTOR_MAP} :
+                                                new String[] {"self", generateDescriptorName(fileName)}))));
         function.addQualifiers(new String[]{"public", "isolated"});
         return function;
     }

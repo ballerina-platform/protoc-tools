@@ -345,6 +345,6 @@ public class ToolingCommonTest {
     @Test
     public void testImportsWithEnums() {
         assertGeneratedSources("data-types/enum_imports", "child.proto",
-                "child_pb.bal", "helloworld_service.bal","helloworld_client.bal", "tool_test_data_type_26");
+                "child_pb.bal", "helloworld_service.bal", "helloworld_client.bal", "tool_test_data_type_26");
     }
 }
