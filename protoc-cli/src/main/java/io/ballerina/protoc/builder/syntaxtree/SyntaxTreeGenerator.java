@@ -135,7 +135,7 @@ public class SyntaxTreeGenerator {
             Constant descriptorMap = new Constant(
                     "public ",
                     getMapTypeDescriptorNode(SYNTAX_TREE_VAR_STRING),
-                    DESCRIPTOR_MAP,
+                    stubFile.getFileName().toUpperCase() + DESCRIPTOR_MAP,
                     generateDescMap(fileImports).getMappingConstructorExpressionNode()
             );
             moduleMembers = moduleMembers.add(descriptorMap.getConstantDeclarationNode());
@@ -272,7 +272,7 @@ public class SyntaxTreeGenerator {
     private static Map generateDescMap(List<String> importList) {
         Map descMap = new Map();
         for (String filename: importList) {
-            String importDescName = generateDescriptorName(filename.split(REGEX_DOT_SEPERATOR)[0]);
+            String importDescName = generateDescriptorName(filename.split(REGEX_DOT_SEPERATOR)[0].replace("/", "_"));
             String protoFileName = filename.substring(0, filename.lastIndexOf(PACKAGE_SEPARATOR));
             if (protofileModuleMap.containsKey(protoFileName)) {
                 String subModuleName = protofileModuleMap.get(protoFileName);
@@ -323,7 +323,7 @@ public class SyntaxTreeGenerator {
         if (fileImports.size() > 0) {
             grpcServiceDescriptor.addField(
                     "descMap",
-                    DESCRIPTOR_MAP
+                    fileName.toUpperCase() + DESCRIPTOR_MAP
             );
         }
         service.addAnnotation(grpcServiceDescriptor.getAnnotationNode());
@@ -403,9 +403,19 @@ public class SyntaxTreeGenerator {
                                 getMethodCallExpressionNode(
                                         getFieldAccessExpressionNode("self", "grpcClient"),
                                         "initStub",
-                                        addDescMap ? new String[] {"self",
-                                                generateDescriptorName(fileName), DESCRIPTOR_MAP} :
-                                                new String[] {"self", generateDescriptorName(fileName)}))));
+                                        addDescMap ? new String[] {
+                                                "self",
+                                                generateDescriptorName(fileName),
+                                                fileName.toUpperCase() + DESCRIPTOR_MAP
+                                        } :
+                                                new String[] {
+                                                        "self",
+                                                        generateDescriptorName(fileName)
+                                        }
+                                        )
+                        )
+                )
+        );
         function.addQualifiers(new String[]{"public", "isolated"});
         return function;
     }
