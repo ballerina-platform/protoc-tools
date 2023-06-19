@@ -4,7 +4,7 @@ import tool_test_packaging_3.message2;
 
 listener grpc:Listener ep = new (9090);
 
-@grpc:Descriptor {value: PACKAGEWITHMULTIPLEIMPORTS_DESC}
+@grpc:Descriptor {value: PACKAGEWITHMULTIPLEIMPORTS_DESC, descMap: PACKAGEWITHMULTIPLEIMPORTS_DESCRIPTOR_MAP}
 service "helloWorld" on ep {
 
     remote function hello1(message1:ReqMessage1 value) returns message2:ResMessage2|error {

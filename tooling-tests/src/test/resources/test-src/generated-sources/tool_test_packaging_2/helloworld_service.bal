@@ -3,7 +3,7 @@ import tool_test_packaging_2.message;
 
 listener grpc:Listener ep = new (9090);
 
-@grpc:Descriptor {value: PACKAGEWITHMESSAGEIMPORT_DESC}
+@grpc:Descriptor {value: PACKAGEWITHMESSAGEIMPORT_DESC, descMap: PACKAGEWITHMESSAGEIMPORT_DESCRIPTOR_MAP}
 service "helloWorld" on ep {
 
     remote function hello1(message:ReqMessage value) returns message:ResMessage|error {

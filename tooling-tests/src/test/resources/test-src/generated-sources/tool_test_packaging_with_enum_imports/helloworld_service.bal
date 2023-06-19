@@ -2,7 +2,7 @@ import ballerina/grpc;
 
 listener grpc:Listener ep = new (9090);
 
-@grpc:Descriptor {value: PACKAGEWITHENUMIMPORTS_DESC, descMap: descriptorMap}
+@grpc:Descriptor {value: PACKAGEWITHENUMIMPORTS_DESC, descMap: PACKAGEWITHENUMIMPORTS_DESCRIPTOR_MAP}
 service "helloWorld" on ep {
 
     remote function hello1(Message value) returns Message|error {

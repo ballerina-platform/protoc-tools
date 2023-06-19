@@ -2,7 +2,7 @@ import ballerina/grpc;
 import ballerina/protobuf;
 
 public const string CHILD_DESC = "0A0B6368696C642E70726F746F1A0C706172656E742E70726F746F22200A0C4368696C644D65737361676512100A036D736718012001280552036D736732C9010A094368696C6454657374122B0A0A63616C6C4368696C6431120E2E506172656E744D6573736167651A0D2E4368696C644D657373616765122D0A0A63616C6C4368696C6432120E2E506172656E744D6573736167651A0D2E4368696C644D6573736167652801122E0A0A63616C6C4368696C6433120E2E506172656E744D6573736167651A0E2E506172656E744D657373616765300112300A0A63616C6C4368696C6434120E2E506172656E744D6573736167651A0E2E506172656E744D65737361676528013001620670726F746F33";
-public const map<string> descriptorMap = {"parent.proto": PARENT_DESC};
+public const map<string> CHILD_DESCRIPTOR_MAP = {"parent.proto": PARENT_DESC};
 
 public isolated client class ChildTestClient {
     *grpc:AbstractClientEndpoint;
@@ -11,7 +11,7 @@ public isolated client class ChildTestClient {
 
     public isolated function init(string url, *grpc:ClientConfiguration config) returns grpc:Error? {
         self.grpcClient = check new (url, config);
-        check self.grpcClient.initStub(self, CHILD_DESC, descriptorMap);
+        check self.grpcClient.initStub(self, CHILD_DESC, CHILD_DESCRIPTOR_MAP);
     }
 
     isolated remote function callChild1(ParentMessage|ContextParentMessage req) returns ChildMessage|grpc:Error {

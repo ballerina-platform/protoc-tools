@@ -3,7 +3,7 @@ import ballerina/time;
 import ballerina/protobuf.types.timestamp;
 
 public const string TIME_ROOT_DESC = "0A0F74696D655F726F6F742E70726F746F1A1474696D655F646570656E64656E742E70726F746F1A1F676F6F676C652F70726F746F6275662F74696D657374616D702E70726F746F32430A0A68656C6C6F576F726C6412350A0873656E6454696D65121A2E676F6F676C652E70726F746F6275662E54696D657374616D701A092E4772656574696E6728013001620670726F746F33";
-public const map<string> descriptorMap = {"time_dependent.proto": TIME_DEPENDENT_DESC};
+public const map<string> TIME_ROOT_DESCRIPTOR_MAP = {"time_dependent.proto": TIME_DEPENDENT_DESC};
 
 public isolated client class helloWorldClient {
     *grpc:AbstractClientEndpoint;
@@ -12,7 +12,7 @@ public isolated client class helloWorldClient {
 
     public isolated function init(string url, *grpc:ClientConfiguration config) returns grpc:Error? {
         self.grpcClient = check new (url, config);
-        check self.grpcClient.initStub(self, TIME_ROOT_DESC, descriptorMap);
+        check self.grpcClient.initStub(self, TIME_ROOT_DESC, TIME_ROOT_DESCRIPTOR_MAP);
     }
 
     isolated remote function sendTime() returns SendTimeStreamingClient|grpc:Error {
