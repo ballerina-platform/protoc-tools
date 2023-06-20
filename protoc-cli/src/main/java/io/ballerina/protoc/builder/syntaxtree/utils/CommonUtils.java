@@ -23,6 +23,7 @@ import io.ballerina.compiler.syntax.tree.ImportDeclarationNode;
 import io.ballerina.compiler.syntax.tree.NodeList;
 import io.ballerina.compiler.syntax.tree.TypeDescriptorNode;
 import io.ballerina.protoc.builder.stub.Method;
+import io.ballerina.protoc.builder.stub.ServiceStub;
 import io.ballerina.protoc.builder.stub.StubFile;
 import io.ballerina.protoc.builder.syntaxtree.components.Function;
 import io.ballerina.protoc.builder.syntaxtree.components.IfElse;
@@ -284,10 +285,23 @@ public class CommonUtils {
     }
 
     public static void addImports(StubFile stubFile, Set<String> ballerinaImports, Set<String> protobufImports) {
+        List<Method> methodList = new ArrayList<>();
+        for (ServiceStub serviceStub : stubFile.getStubList()) {
+            methodList.addAll(serviceStub.getUnaryFunctions());
+            methodList.addAll(serviceStub.getClientStreamingFunctions());
+            methodList.addAll(serviceStub.getServerStreamingFunctions());
+            methodList.addAll(serviceStub.getBidiStreamingFunctions());
+        }
         for (String protobufImport : stubFile.getImportList()) {
             switch (protobufImport) {
                 case "google/protobuf/wrappers.proto" :
-                    protobufImports.add("wrappers");
+                    if (checkForImportsInServices(methodList, "string") ||
+                            checkForImportsInServices(methodList, "int") ||
+                            checkForImportsInServices(methodList, "float") ||
+                            checkForImportsInServices(methodList, "byte[]") ||
+                            checkForImportsInServices(methodList, "boolean")) {
+                        protobufImports.add("wrappers");
+                    }
                     break;
                 case "google/protobuf/timestamp.proto" :
                 case "google/protobuf/duration.proto" :

@@ -356,12 +356,15 @@ public class ClientSampleSyntaxTreeUtils {
                 node = getCaptureBindingPatternNode("[72,101,108,108,111]");
                 break;
             case "Timestamp":
+            case "time:Utc":
                 node = getCaptureBindingPatternNode("[1659688553,0.310073000d]");
                 break;
             case "Duration":
+            case "time:Seconds":
                 node = getCaptureBindingPatternNode("0.310073000d");
                 break;
             case "Struct":
+            case "map<anydata>":
                 node = getCaptureBindingPatternNode("{message: \"Hello Ballerina\"}");
                 break;
             case "string":
