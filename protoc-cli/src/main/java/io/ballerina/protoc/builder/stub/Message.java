@@ -25,8 +25,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import static io.ballerina.protoc.builder.balgen.BalGenerationUtils.getMappingBalType;
 import static io.ballerina.protoc.GrpcConstants.REGEX_DOT_SEPERATOR;
+import static io.ballerina.protoc.builder.balgen.BalGenerationUtils.getMappingBalType;
 
 /**
  * Message Definition bean class.
