@@ -50,4 +50,5 @@ public class GrpcConstants {
             ANN_DESCRIPTOR);
     public static final BString ANN_PROTOBUF_DESCRIPTOR = StringUtils.fromString(PROTOCOL_STRUCT_PACKAGE_PROTOBUF +
             ":" + ANN_DESCRIPTOR);
+    public static final String DESCRIPTOR_MAP = "_DESCRIPTOR_MAP";
 }

@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package enum_imports;
+
+import "parent.proto";
+
+service HelloWorld {
+  rpc hello(Hello) returns (Hello);
+}
+
+message Hello {
+  string name = 1;
+  Location location = 2;
+}

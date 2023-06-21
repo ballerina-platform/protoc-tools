@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- [Add descriptor map to `grpc:Descriptor` and stub initialization](https://github.com/ballerina-platform/ballerina-standard-library/issues/4555)
+
+## [0.1.1] - 2023-06-01
+
+### Fixed
+
 - [Fix required input error when `help` command is provided](https://github.com/ballerina-platform/ballerina-standard-library/issues/4446)
 
 ## [0.1.0] - 2023-02-24

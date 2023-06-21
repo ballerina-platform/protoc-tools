@@ -19,14 +19,13 @@
 package io.ballerina.protoc.builder.syntaxtree.components;
 
 import io.ballerina.compiler.syntax.tree.AbstractNodeFactory;
-import io.ballerina.compiler.syntax.tree.BasicLiteralNode;
 import io.ballerina.compiler.syntax.tree.ConstantDeclarationNode;
+import io.ballerina.compiler.syntax.tree.ExpressionNode;
 import io.ballerina.compiler.syntax.tree.NodeFactory;
 import io.ballerina.compiler.syntax.tree.Token;
 import io.ballerina.compiler.syntax.tree.TypeDescriptorNode;
 import io.ballerina.protoc.builder.syntaxtree.constants.SyntaxTreeConstants;
 
-import static io.ballerina.protoc.builder.syntaxtree.components.Literal.getStringLiteralNode;
 import static io.ballerina.protoc.builder.syntaxtree.components.TypeDescriptor.getBuiltinSimpleNameReferenceNode;
 
 /**
@@ -39,14 +38,21 @@ public class Constant {
     private final Token constKeyWord = AbstractNodeFactory.createIdentifierToken("const ");
     private final TypeDescriptorNode typeDescriptor;
     private final Token variableName;
-    private final BasicLiteralNode initializer;
+    private final ExpressionNode initializer;
     private final Token visibility;
 
-    public Constant(String visibilty, String type, String name, String value) {
-        visibility = AbstractNodeFactory.createIdentifierToken(visibilty);
+    public Constant(String visibility, String type, String name, ExpressionNode value) {
+        this.visibility = AbstractNodeFactory.createIdentifierToken(visibility);
         typeDescriptor = getBuiltinSimpleNameReferenceNode(type);
         variableName = AbstractNodeFactory.createIdentifierToken(name);
-        initializer = getStringLiteralNode(value);
+        initializer = value;
+    }
+
+    public Constant(String visibility, TypeDescriptorNode type, String name, ExpressionNode value) {
+        this.visibility = AbstractNodeFactory.createIdentifierToken(visibility);
+        typeDescriptor = type;
+        variableName = AbstractNodeFactory.createIdentifierToken(name);
+        initializer = value;
     }
 
     public ConstantDeclarationNode getConstantDeclarationNode() {

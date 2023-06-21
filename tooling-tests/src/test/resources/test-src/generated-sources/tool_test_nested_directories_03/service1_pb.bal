@@ -2,6 +2,7 @@ import ballerina/grpc;
 import ballerina/protobuf;
 
 public const string SERVICE1_DESC = "0A16666F6F2F6261722F73657276696365312E70726F746F1A0F6D65737361676573322E70726F746F22200A0C4D61696E4D6573736167653112100A036D736718012001280552036D736732520A0A4D79536572766963653112250A0563616C6C31120D2E4D61696E4D657373616765311A0D2E4D61696E4D65737361676531121D0A0563616C6C3212092E4D657373616765321A092E4D65737361676532620670726F746F33";
+public const map<string> SERVICE1_DESCRIPTOR_MAP = {"messages2.proto": MESSAGES2_DESC};
 
 public isolated client class MyService1Client {
     *grpc:AbstractClientEndpoint;
@@ -10,7 +11,7 @@ public isolated client class MyService1Client {
 
     public isolated function init(string url, *grpc:ClientConfiguration config) returns grpc:Error? {
         self.grpcClient = check new (url, config);
-        check self.grpcClient.initStub(self, SERVICE1_DESC);
+        check self.grpcClient.initStub(self, SERVICE1_DESC, SERVICE1_DESCRIPTOR_MAP);
     }
 
     isolated remote function call1(MainMessage1|ContextMainMessage1 req) returns MainMessage1|grpc:Error {

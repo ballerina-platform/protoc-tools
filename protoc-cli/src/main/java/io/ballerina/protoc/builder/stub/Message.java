@@ -25,6 +25,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import static io.ballerina.protoc.GrpcConstants.REGEX_DOT_SEPERATOR;
+
 /**
  * Message Definition bean class.
  *
@@ -195,7 +197,7 @@ public class Message {
         if (!packageName.isBlank()) {
             typeName = typeName.replaceFirst("^\\." + packageName, "");
         }
-        String[] types =  typeName.split("\\.");
+        String[] types =  typeName.split(REGEX_DOT_SEPERATOR);
         for (int i = 1; i < types.length; i++) {
             if (fieldType.toString().isBlank()) {
                 fieldType.append(types[i]);

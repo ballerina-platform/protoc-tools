@@ -68,6 +68,7 @@ import static io.ballerina.protoc.builder.balgen.BalGenConstants.GOOGLE_API_LIB;
 import static io.ballerina.protoc.builder.balgen.BalGenConstants.GOOGLE_STANDARD_LIB;
 import static io.ballerina.protoc.builder.balgen.BalGenConstants.PACKAGE_SEPARATOR;
 import static io.ballerina.protoc.builder.syntaxtree.utils.ClientSampleSyntaxTreeUtils.generateSyntaxTreeForClientSample;
+import static io.ballerina.protoc.builder.syntaxtree.utils.CommonUtils.removeStandardImports;
 import static io.ballerina.protoc.protobuf.utils.BalFileGenerationUtils.delete;
 import static io.ballerina.protoc.protobuf.utils.BalFileGenerationUtils.handleProcessExecutionErrors;
 import static io.ballerina.protoc.protobuf.utils.BalFileGenerationUtils.runProcess;
@@ -266,6 +267,8 @@ public class BallerinaFileBuilder {
                 stubFileObject.setRootDescriptor(stubRootDescriptor);
             }
 
+            List<String> fileImports = removeStandardImports(stubFileObject.getImportList());
+
             int serviceIndex = 0;
             for (ServiceStub serviceStub : stubFileObject.getStubList()) {
                 if (BalGenConstants.GRPC_SERVICE.equals(mode)) {
@@ -276,7 +279,8 @@ public class BallerinaFileBuilder {
                             SyntaxTreeGenerator.generateSyntaxTreeForServiceSample(
                                     serviceStub,
                                     serviceIndex == 0,
-                                    stubFileObject.getFileName()
+                                    stubFileObject.getFileName(),
+                                    fileImports
                             ),
                             serviceFilePath
                     );
@@ -297,7 +301,8 @@ public class BallerinaFileBuilder {
             } else {
                 stubFilePath = generateOutputFile(this.balOutPath, filename + BalGenConstants.STUB_FILE_PREFIX);
             }
-            writeOutputFile(SyntaxTreeGenerator.generateSyntaxTree(stubFileObject, isRoot, mode), stubFilePath);
+            writeOutputFile(SyntaxTreeGenerator.generateSyntaxTree(stubFileObject, isRoot, mode, fileImports),
+                    stubFilePath);
         } catch (IOException e) {
             throw new CodeBuilderException("IO Error while reading proto file descriptor. " + e.getMessage(), e);
         }

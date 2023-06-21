@@ -29,7 +29,7 @@ public class StubFile extends AbstractStub {
     private final List<ServiceStub> stubList = new ArrayList<>();
     private final List<String> importList = new ArrayList<>();
     private final String fileName;
-    
+
     public StubFile(String fileName) {
         this.fileName = fileName;
     }

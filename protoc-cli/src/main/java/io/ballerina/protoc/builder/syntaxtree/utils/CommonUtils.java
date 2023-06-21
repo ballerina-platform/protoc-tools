@@ -30,6 +30,7 @@ import io.ballerina.protoc.builder.syntaxtree.components.Imports;
 import io.ballerina.protoc.builder.syntaxtree.components.Map;
 import io.ballerina.protoc.builder.syntaxtree.components.VariableDeclaration;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -63,6 +64,13 @@ import static io.ballerina.protoc.builder.syntaxtree.constants.SyntaxTreeConstan
  @since 0.1.0
  */
 public class CommonUtils {
+
+    private static final Set<String> STANDARD_IMPORTS = Set.of(
+            "google/protobuf/wrappers.proto", "google/protobuf/timestamp.proto", "google/protobuf/duration.proto",
+            "google/protobuf/any.proto", "google/protobuf/empty.proto", "google/protobuf/type.proto",
+            "google/protobuf/struct.proto", "google/protobuf/descriptor.proto", "google/protobuf/api.proto",
+            "google/protobuf/field_mask.proto", "google/protobuf/source_context.proto", "google/api/annotations.proto",
+            "google/api/http.proto", "ballerina/protobuf/descriptor.proto");
 
     private CommonUtils() {
 
@@ -295,6 +303,16 @@ public class CommonUtils {
                     break;
             }
         }
+    }
+
+    public static List<String> removeStandardImports(List<String> importList) {
+        List<String> filteredImports = new ArrayList<>();
+        for (String importName: importList) {
+            if (!STANDARD_IMPORTS.contains(importName)) {
+                filteredImports.add(importName);
+            }
+        }
+        return filteredImports;
     }
 
     public static String getModulePrefix(String contextParam, String filename) {

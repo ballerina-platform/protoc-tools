@@ -83,7 +83,7 @@ public class ToolingTestUtils {
         copyBallerinaToml(destTomlFile);
 
         Assert.assertFalse(hasSemanticDiagnostics(outputDirPath, false));
-        Assert.assertEquals(readContent(expectedStubFilePath), readContent(actualStubFilePath));
+        Assert.assertEquals(readContent(actualStubFilePath), readContent(expectedStubFilePath));
         try {
             Files.deleteIfExists(actualStubFilePath);
         } catch (IOException e) {
@@ -95,8 +95,8 @@ public class ToolingTestUtils {
         Assert.assertTrue(Files.exists(actualStubFilePath));
         Assert.assertTrue(Files.exists(actualClientFilePath));
         Assert.assertFalse(hasSemanticDiagnostics(outputDirPath, false));
-        Assert.assertEquals(readContent(expectedClientStubFilePath), readContent(actualStubFilePath));
-        Assert.assertEquals(readContent(expectedClientFilePath), readContent(actualClientFilePath));
+        Assert.assertEquals(readContent(actualStubFilePath), readContent(expectedClientStubFilePath));
+        Assert.assertEquals(readContent(actualClientFilePath), readContent(expectedClientFilePath));
         try {
             Files.deleteIfExists(actualStubFilePath);
             Files.deleteIfExists(actualClientFilePath);
@@ -110,8 +110,8 @@ public class ToolingTestUtils {
         Assert.assertTrue(Files.exists(actualServiceFilePath));
         Assert.assertFalse(hasSyntacticDiagnostics(actualStubFilePath));
         Assert.assertFalse(hasSyntacticDiagnostics(actualServiceFilePath));
-        Assert.assertEquals(readContent(expectedStubFilePath), readContent(actualStubFilePath));
-        Assert.assertEquals(readContent(expectedServiceFilePath), readContent(actualServiceFilePath));
+        Assert.assertEquals(readContent(actualStubFilePath), readContent(expectedStubFilePath));
+        Assert.assertEquals(readContent(actualServiceFilePath), readContent(expectedServiceFilePath));
 
         try {
             Files.deleteIfExists(actualServiceFilePath);
@@ -123,7 +123,7 @@ public class ToolingTestUtils {
                 expectedStubFilePath = Paths.get(RESOURCE_DIRECTORY.toString(), BAL_FILE_DIRECTORY,
                         outputDir, subModuleFile);
                 actualStubFilePath = outputDirPath.resolve(subModuleFile);
-                Assert.assertEquals(readContent(expectedStubFilePath), readContent(actualStubFilePath));
+                Assert.assertEquals(readContent(actualStubFilePath), readContent(expectedStubFilePath));
             }
         }
     }

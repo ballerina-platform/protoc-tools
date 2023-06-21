@@ -1,6 +1,7 @@
 import ballerina/grpc;
 
 public const string DEPENDINGSERVICE_DESC = "0A16646570656E64696E67536572766963652E70726F746F1A1268656C6C6F536572766963652E70726F746F32310A0A68656C6C6F576F726C6412230A0568656C6C6F120B2E5265714D6573736167651A0B2E5265734D6573736167653001620670726F746F33";
+public const map<string> DEPENDINGSERVICE_DESCRIPTOR_MAP = {"helloService.proto": HELLOSERVICE_DESC};
 
 public isolated client class helloWorldClient {
     *grpc:AbstractClientEndpoint;
@@ -9,7 +10,7 @@ public isolated client class helloWorldClient {
 
     public isolated function init(string url, *grpc:ClientConfiguration config) returns grpc:Error? {
         self.grpcClient = check new (url, config);
-        check self.grpcClient.initStub(self, DEPENDINGSERVICE_DESC);
+        check self.grpcClient.initStub(self, DEPENDINGSERVICE_DESC, DEPENDINGSERVICE_DESCRIPTOR_MAP);
     }
 
     isolated remote function hello(ReqMessage|ContextReqMessage req) returns stream<ResMessage, grpc:Error?>|grpc:Error {
