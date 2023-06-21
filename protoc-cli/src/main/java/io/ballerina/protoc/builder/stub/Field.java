@@ -167,6 +167,8 @@ public class Field {
 
         CUSTOM_FIELD_TYPE_MAP = new HashMap<>();
         CUSTOM_FIELD_TYPE_MAP.put(".google.protobuf.Any", "'any:Any");
+        CUSTOM_FIELD_TYPE_MAP.put(".google.protobuf.Timestamp", "time:Utc");
+        CUSTOM_FIELD_TYPE_MAP.put(".google.protobuf.Duration", "time:Seconds");
 
         FIELD_DEFAULT_VALUE_MAP = new HashMap<>();
         FIELD_DEFAULT_VALUE_MAP.put(DescriptorProtos.FieldDescriptorProto.Type.TYPE_DOUBLE, "0.0");
@@ -187,6 +189,8 @@ public class Field {
 
         CUSTOM_DEFAULT_VALUE_MAP = new HashMap<>();
         CUSTOM_DEFAULT_VALUE_MAP.put(".google.protobuf.Any", "()");
+        CUSTOM_DEFAULT_VALUE_MAP.put(".google.protobuf.Timestamp", "[0, 0.0d]");
+        CUSTOM_DEFAULT_VALUE_MAP.put(".google.protobuf.Duration", "0.0d");
 
         FIELD_LABEL_MAP = new HashMap<>();
         FIELD_LABEL_MAP.put(DescriptorProtos.FieldDescriptorProto.Label.LABEL_OPTIONAL, null);
