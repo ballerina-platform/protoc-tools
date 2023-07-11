@@ -22,6 +22,8 @@ import io.ballerina.compiler.syntax.tree.CheckExpressionNode;
 import io.ballerina.compiler.syntax.tree.ImportDeclarationNode;
 import io.ballerina.compiler.syntax.tree.NodeList;
 import io.ballerina.compiler.syntax.tree.TypeDescriptorNode;
+import io.ballerina.protoc.builder.stub.Field;
+import io.ballerina.protoc.builder.stub.Message;
 import io.ballerina.protoc.builder.stub.Method;
 import io.ballerina.protoc.builder.stub.ServiceStub;
 import io.ballerina.protoc.builder.stub.StubFile;
@@ -315,6 +317,13 @@ public class CommonUtils {
                     break;
                 default:
                     break;
+            }
+        }
+        for (java.util.Map.Entry<String, Message> message : stubFile.getMessageMap().entrySet()) {
+            for (Field field : message.getValue().getFieldList()) {
+                if (field.getFieldType().equals("int:Signed32") || field.getFieldType().equals("int:Unsigned32")) {
+                    ballerinaImports.add("lang.'int");
+                }
             }
         }
     }

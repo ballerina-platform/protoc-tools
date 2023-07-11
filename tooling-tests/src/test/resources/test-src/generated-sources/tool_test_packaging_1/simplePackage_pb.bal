@@ -1,4 +1,5 @@
 import ballerina/grpc;
+import ballerina/lang.'int;
 import ballerina/protobuf;
 import ballerina/protobuf.types.wrappers;
 
@@ -148,12 +149,12 @@ public type ContextHelloRequest record {|
 @protobuf:Descriptor {value: SIMPLEPACKAGE_DESC}
 public type HelloResponse record {|
     string msg = "";
-    int id = 0;
+    int:Signed32 id = 0;
 |};
 
 @protobuf:Descriptor {value: SIMPLEPACKAGE_DESC}
 public type HelloRequest record {|
     string msg = "";
-    int id = 0;
+    int:Signed32 id = 0;
 |};
 

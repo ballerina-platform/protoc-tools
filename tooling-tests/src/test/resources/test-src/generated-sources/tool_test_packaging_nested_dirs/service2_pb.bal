@@ -1,4 +1,5 @@
 import ballerina/grpc;
+import ballerina/lang.'int;
 import ballerina/protobuf;
 import tool_test_packaging_nested_dirs.messages;
 
@@ -148,6 +149,6 @@ public type ContextMainMessage2 record {|
 
 @protobuf:Descriptor {value: SERVICE2_DESC}
 public type MainMessage2 record {|
-    int msg = 0;
+    int:Signed32 msg = 0;
 |};
 

@@ -202,13 +202,13 @@ public type HelloResponse record {|
 
 @protobuf:Descriptor {value: HELLOWORLDWITHNESTEDMESSAGE_DESC}
 public type HelloResponse_Bar record {|
-    int i = 0;
+    int:Signed32 i = 0;
     HelloResponse_Bar_Foo[] foo = [];
 |};
 
 @protobuf:Descriptor {value: HELLOWORLDWITHNESTEDMESSAGE_DESC}
 public type HelloResponse_Bar_Foo record {|
-    int i = 0;
+    int:Signed32 i = 0;
 |};
 
 @protobuf:Descriptor {value: HELLOWORLDWITHNESTEDMESSAGE_DESC}

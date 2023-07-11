@@ -1,4 +1,5 @@
 import ballerina/grpc;
+import ballerina/lang.'int;
 import ballerina/protobuf;
 import ballerina/protobuf.types.'any;
 import ballerina/grpc.types.'any as sany;
@@ -263,13 +264,13 @@ public client class AnyTypeServerAnyCaller {
 @protobuf:Descriptor {value: ANY_DESC}
 public type Person1 record {|
     string name = "";
-    int code = 0;
+    int:Signed32 code = 0;
 |};
 
 @protobuf:Descriptor {value: ANY_DESC}
 public type Person2 record {|
     string name = "";
-    int code = 0;
+    int:Signed32 code = 0;
     string add = "";
 |};
 

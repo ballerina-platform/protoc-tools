@@ -1,4 +1,5 @@
 import ballerina/grpc;
+import ballerina/lang.'int;
 import ballerina/protobuf;
 import ballerina/protobuf.types.wrappers;
 
@@ -271,6 +272,6 @@ public type ContextChildMessage record {|
 
 @protobuf:Descriptor {value: CHILD_DESC}
 public type ChildMessage record {|
-    int msg = 0;
+    int:Signed32 msg = 0;
 |};
 
