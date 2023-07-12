@@ -38,6 +38,7 @@ message Test2 {
     uint64 g = 7;
     fixed32 h = 8;
     fixed64 i = 9;
+    sint32 j = 10;
 }
 
 message Test3 {
@@ -50,6 +51,7 @@ message Test3 {
     repeated uint64 g = 7;
     repeated fixed32 h = 8;
     repeated fixed64 i = 9;
+    repeated sint32 j = 10;
 }
 
 message Test4 {
