@@ -345,6 +345,8 @@ public class ClientSampleSyntaxTreeUtils {
         Node node;
         switch (field.getFieldType()) {
             case "int":
+            case "int:Signed32":
+            case "int:Unsigned32":
             case "float":
             case "decimal":
                 node = getCaptureBindingPatternNode("1");

@@ -1,3 +1,4 @@
+import ballerina/lang.'int;
 import ballerina/protobuf;
 import ballerina/time;
 import ballerina/protobuf.types.'any;
@@ -45,7 +46,7 @@ public type Test3 record {|
     float[] c = [];
     int[] d = [];
     int[] e = [];
-    int[] f = [];
+    int:Unsigned32[] f = [];
     int[] g = [];
     int[] h = [];
     int[] i = [];
@@ -58,7 +59,7 @@ public type Test2 record {|
     float c = 0.0;
     int d = 0;
     int e = 0;
-    int f = 0;
+    int:Unsigned32 f = 0;
     int g = 0;
     int h = 0;
     int i = 0;
