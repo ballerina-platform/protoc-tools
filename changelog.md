@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- [Support subtypes of int in protoc-tool and gRPC](https://github.com/ballerina-platform/ballerina-standard-library/issues/4543)
+
+## [0.1.2] - 2023-07-03
+
 ### Fixed
 
 - [Add descriptor map to `grpc:Descriptor` and stub initialization](https://github.com/ballerina-platform/ballerina-standard-library/issues/4555)
