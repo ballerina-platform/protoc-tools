@@ -1,4 +1,3 @@
-import ballerina/lang.'int;
 import ballerina/protobuf;
 import ballerina/time;
 import ballerina/protobuf.types.'any;
