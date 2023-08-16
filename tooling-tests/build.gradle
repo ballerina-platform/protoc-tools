@@ -159,7 +159,7 @@ jacocoTestReport {
     def classFiles = new File("${rootDir}/protoc-cli/build/classes/java/main/io/ballerina/protoc")
     additionalClassDirs(classFiles)
     reports {
-        xml.enabled true
+        xml.required = true
     }
 }
 
