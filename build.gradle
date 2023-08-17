@@ -136,6 +136,15 @@ task directoryBuild {
     dependsOn("compileTestJava")
     dependsOn("checkstyle:test")
     dependsOn("checkstyle:processTestResources")
+    dependsOn(":tooling-tests:compileJava")
+    dependsOn(":tooling-tests:compileTestJava")
+    dependsOn(":tooling-tests:jar")
+    dependsOn(":tooling-tests:checkstyleTest")
+    dependsOn(":tooling-tests:spotbugsTest")
+    dependsOn(":tooling-tests:test")
+    dependsOn(":tooling-tests:copyStdlibs")
+    dependsOn(":tooling-tests:jBallerinaPack")
+    dependsOn(":tooling-tests:jacocoTestReport")
     inputs.dir file(project.projectDir)
     doLast {
         copy {
