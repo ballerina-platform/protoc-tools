@@ -16,7 +16,7 @@
  */
 
 plugins {
-    id 'java'
+    id 'java-library'
     id 'checkstyle'
 }
 
@@ -93,7 +93,7 @@ jacoco {
 jacocoTestReport {
     dependsOn test
     reports {
-        xml.enabled true
+        xml.required = true
     }
 }
 

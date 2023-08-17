@@ -17,7 +17,7 @@
  */
 
 plugins {
-    id 'java'
+    id 'java-library'
     id 'jacoco'
     id "com.github.spotbugs" version "${githubSpotbugsVersion}"
     id "com.github.johnrengelman.shadow" version "${githubJohnrengelmanShadowVersion}"
@@ -69,7 +69,7 @@ allprojects {
 }
 
 subprojects {
-    apply plugin: 'java'
+    apply plugin: 'java-library'
     configurations {
         externalJars
         ballerinaStdLibs
@@ -101,9 +101,9 @@ task codeCoverageReport(type: JacocoReport) {
         sourceSets it.sourceSets.main
     }
     reports {
-        xml.enabled(true)
-        html.enabled(true)
-        csv.enabled(true)
+        xml.required = true
+        html.required = true
+        csv.required = true
         xml.destination(new File("${buildDir}/reports/jacoco/report.xml"))
         html.destination(new File("${buildDir}/reports/jacoco/report.html"))
         csv.destination(new File("${buildDir}/reports/jacoco/report.csv"))
@@ -126,6 +126,25 @@ jar {
 }
 
 task directoryBuild {
+    dependsOn(compileJava)
+    dependsOn(compileTestJava)
+    dependsOn(":test")
+    dependsOn(":jar")
+    dependsOn(":processResources")
+    dependsOn(":spotbugsMain")
+    dependsOn(":spotbugsTest")
+    dependsOn("compileTestJava")
+    dependsOn("checkstyle:test")
+    dependsOn("checkstyle:processTestResources")
+    dependsOn(":tooling-tests:compileJava")
+    dependsOn(":tooling-tests:compileTestJava")
+    dependsOn(":tooling-tests:jar")
+    dependsOn(":tooling-tests:checkstyleTest")
+    dependsOn(":tooling-tests:spotbugsTest")
+    dependsOn(":tooling-tests:test")
+    dependsOn(":tooling-tests:copyStdlibs")
+    dependsOn(":tooling-tests:jBallerinaPack")
+    dependsOn(":tooling-tests:jacocoTestReport")
     inputs.dir file(project.projectDir)
     doLast {
         copy {
@@ -136,6 +155,7 @@ task directoryBuild {
 
     outputs.dir artifactCacheParent
     outputs.dir artifactLibParent
+    doNotTrackState("build needs to run every time")
 }
 
 task createArtifactZip(type: Zip) {

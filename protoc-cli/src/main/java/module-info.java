@@ -25,7 +25,6 @@ module io.ballerina.protoc {
     requires io.ballerina.formatter.core;
     requires io.ballerina.cli;
     requires io.ballerina.toml;
-    requires com.google.protobuf;
     requires info.picocli;
     requires org.slf4j;
     requires org.apache.commons.lang3;
