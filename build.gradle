@@ -145,6 +145,7 @@ task directoryBuild {
     dependsOn(":tooling-tests:copyStdlibs")
     dependsOn(":tooling-tests:jBallerinaPack")
     dependsOn(":tooling-tests:jacocoTestReport")
+    dependsOn(":generatePomFileForMavenJavaPublication")
     inputs.dir file(project.projectDir)
     doLast {
         copy {
