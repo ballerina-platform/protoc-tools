@@ -1,5 +1,5 @@
-import ballerina/io;
 import tool_test_packaging_2.message;
+import ballerina/io;
 
 helloWorldClient ep = check new ("http://localhost:9090");
 

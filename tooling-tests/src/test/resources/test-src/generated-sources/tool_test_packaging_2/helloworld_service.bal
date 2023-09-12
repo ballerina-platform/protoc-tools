@@ -1,5 +1,5 @@
-import ballerina/grpc;
 import tool_test_packaging_2.message;
+import ballerina/grpc;
 
 listener grpc:Listener ep = new (9090);
 
