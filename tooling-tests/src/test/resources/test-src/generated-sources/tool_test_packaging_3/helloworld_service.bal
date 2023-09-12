@@ -1,6 +1,6 @@
-import ballerina/grpc;
 import tool_test_packaging_3.message1;
 import tool_test_packaging_3.message2;
+import ballerina/grpc;
 
 listener grpc:Listener ep = new (9090);
 
