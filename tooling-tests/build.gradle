@@ -181,6 +181,7 @@ jacoco {
 
 jacocoTestReport {
     dependsOn test
+    dependsOn compileJava
     def classFiles = new File("${rootDir}/protoc-cli/build/classes/java/main/io/ballerina/protoc")
     additionalClassDirs(classFiles)
     reports {
