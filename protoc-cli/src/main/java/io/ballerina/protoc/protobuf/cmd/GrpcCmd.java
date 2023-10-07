@@ -125,46 +125,38 @@ public class GrpcCmd implements BLauncherCmd {
     }
     
     @Override
-    public void execute() {
-        //Help flag check
-        if (helpFlag) {
-            String commandUsageInfo = BLauncherCmd.getCommandUsageInfo(getName());
-            outStream.println(commandUsageInfo);
-            return;
-        }
+ public void execute() {
+    // Help flag check
+    if (helpFlag) {
+        String commandUsageInfo = BLauncherCmd.getCommandUsageInfo(getName());
+        outStream.println(commandUsageInfo);
+        return;
+    }
 
+    try {
         if (protoPath.endsWith("**.proto") || new File(protoPath).isDirectory()) {
             // Multiple proto files
-            List<String> protoFiles;
-            try {
-                protoFiles = getProtoFiles(protoPath);
-            } catch (IOException e) {
-                String errorMessage = "Failed to find proto files in the directory. " +
-                        "Please input a valid proto files directory.";
-                outStream.println(errorMessage);
-                return;
+            List<String> protoFiles = getProtoFiles(protoPath);
+            if (protoFiles.isEmpty()) {
+                throw new RuntimeException("Input directory does not contain any proto files. Please input a valid proto files directory."); // Improved error message
             }
-            if (protoFiles.size() == 0) {
-                String errorMessage = "Input directory does not contain any proto files. " +
-                        "Please input a valid proto files directory.";
-                outStream.println(errorMessage);
-            } else {
-                for (String protoFile : protoFiles) {
-                    generateBalFile(protoFile);
-                }
+            for (String protoFile : protoFiles) {
+                generateBalFile(protoFile);
             }
         } else {
             // Single proto file
-            // check input protobuf file path
             Optional<String> pathExtension = getFileExtension(protoPath);
             if (pathExtension.isEmpty() || !PROTO_EXTENSION.equalsIgnoreCase(pathExtension.get())) {
-                String errorMessage = "Invalid proto file path. Please input valid proto file location.";
-                outStream.println(errorMessage);
-                return;
+                throw new RuntimeException("Invalid proto file path. Please input a valid proto file location."); // Improved error message
             }
             generateBalFile(protoPath);
         }
+    } catch (Exception e) {
+        // Print a user-friendly error message
+        outStream.println("Error: " + e.getMessage());
     }
+}
+
 
     private List<String> getProtoFiles(String path) throws IOException {
         if (path.endsWith("**.proto")) {
