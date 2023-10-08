@@ -53,6 +53,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.HashMap;
 
 import static io.ballerina.protoc.GrpcConstants.ORG_NAME;
 import static io.ballerina.protoc.builder.syntaxtree.components.Expression.getCheckExpressionNode;
@@ -89,6 +90,21 @@ public class ClientSampleSyntaxTreeUtils {
     private static final String CONST_ENDPOINT = "ep";
 
     private static boolean firstLine;
+
+    private static final Map<String, ExpressionNode> INPUT_TYPE_EXPR_NODES = new HashMap<>();
+
+    static {
+        INPUT_TYPE_EXPR_NODES.put("int", getNumericLiteralNode(1));
+        INPUT_TYPE_EXPR_NODES.put("float", getNumericLiteralNode(1));
+        INPUT_TYPE_EXPR_NODES.put("decimal", getNumericLiteralNode(1));
+        INPUT_TYPE_EXPR_NODES.put("boolean", getBooleanLiteralNode(true));
+        INPUT_TYPE_EXPR_NODES.put("string", getStringLiteralNode("ballerina"));
+        INPUT_TYPE_EXPR_NODES.put("byte[]", getByteArrayLiteralNode("[72,101,108,108,111]"));
+        INPUT_TYPE_EXPR_NODES.put("time:Utc", getTupleLiteralNode("[1659688553,0.310073000d]"));
+        INPUT_TYPE_EXPR_NODES.put("time:Seconds", getDecimalLiteralNode("0.310073000d"));
+        INPUT_TYPE_EXPR_NODES.put("map<anydata>", createBasicLiteralNode(SyntaxKind.MAP_TYPE_DESC, "{message: \"Hello Ballerina\"}"));
+        INPUT_TYPE_EXPR_NODES.put("'any:Any", getCheckExpressionNode(getFunctionCallExpressionNode("'any", "pack", "\"ballerina\"")));
+    }
 
     public static SyntaxTree generateSyntaxTreeForClientSample(ServiceStub serviceStub, String filename,
                                                                Map<String, Message> msgMap) {
