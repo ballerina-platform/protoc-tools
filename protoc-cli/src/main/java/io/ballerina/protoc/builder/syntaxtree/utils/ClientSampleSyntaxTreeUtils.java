@@ -304,7 +304,7 @@ public class ClientSampleSyntaxTreeUtils {
                         method.getInputType() + " ")),
                 getCaptureBindingPatternNode(getRequestName(method.getMethodName())));
         ExpressionNode node = null;
-        if(INPUT_TYPE_EXPR_NODES.containsKey(method.getInputType())) {
+        if (INPUT_TYPE_EXPR_NODES.containsKey(method.getInputType())) {
             node = INPUT_TYPE_EXPR_NODES.get(method.getInputType());
         } else if (msgMap.containsKey(method.getInputType())) {
             Message msg = msgMap.get(method.getInputType());
