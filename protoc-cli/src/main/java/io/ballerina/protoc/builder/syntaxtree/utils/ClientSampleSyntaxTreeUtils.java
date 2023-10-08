@@ -304,41 +304,14 @@ public class ClientSampleSyntaxTreeUtils {
                         method.getInputType() + " ")),
                 getCaptureBindingPatternNode(getRequestName(method.getMethodName())));
         ExpressionNode node = null;
-        switch (method.getInputType()) {
-            case "int":
-            case "float":
-            case "decimal":
-                node = getNumericLiteralNode(1);
-                break;
-            case "boolean":
-                node = getBooleanLiteralNode(true);
-                break;
-            case "string":
-                node = getStringLiteralNode("ballerina");
-                break;
-            case "byte[]":
-                node = getByteArrayLiteralNode("[72,101,108,108,111]");
-                break;
-            case "time:Utc":
-                node = getTupleLiteralNode("[1659688553,0.310073000d]");
-                break;
-            case "time:Seconds":
-                node = getDecimalLiteralNode("0.310073000d");
-                break;
-            case "map<anydata>":
-                node = createBasicLiteralNode(SyntaxKind.MAP_TYPE_DESC, "{message: \"Hello Ballerina\"}");
-                break;
-            case "'any:Any":
-                node = getCheckExpressionNode(getFunctionCallExpressionNode("'any", "pack", "\"ballerina\""));
-                break;
-            default:
-                if (msgMap.containsKey(method.getInputType())) {
-                    Message msg = msgMap.get(method.getInputType());
-                    node = NodeFactory.createMappingConstructorExpressionNode(
-                            SyntaxTreeConstants.SYNTAX_TREE_OPEN_BRACE,
-                            NodeFactory.createSeparatedNodeList(getFieldNodes(msg, msgMap)),
-                            SyntaxTreeConstants.SYNTAX_TREE_CLOSE_BRACE);
-                }
+        if(INPUT_TYPE_EXPR_NODES.containsKey(method.getInputType())) {
+            node = INPUT_TYPE_EXPR_NODES.get(method.getInputType());
+        } else if (msgMap.containsKey(method.getInputType())) {
+            Message msg = msgMap.get(method.getInputType());
+            node = NodeFactory.createMappingConstructorExpressionNode(
+                    SyntaxTreeConstants.SYNTAX_TREE_OPEN_BRACE,
+                    NodeFactory.createSeparatedNodeList(getFieldNodes(msg, msgMap)),
+                    SyntaxTreeConstants.SYNTAX_TREE_CLOSE_BRACE);
         }
         VariableDeclaration valueVariable = new VariableDeclaration(bindingPatternNode, node);
         return valueVariable.getVariableDeclarationNode();
