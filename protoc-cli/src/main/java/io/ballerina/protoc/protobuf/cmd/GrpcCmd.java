@@ -152,6 +152,7 @@ public class GrpcCmd implements BLauncherCmd {
             generateBalFile(protoPath);
         }
     } catch (Exception e) {
+        // Print a user-friendly error message
         outStream.println("Error: " + e.getMessage());
     }
 }
