@@ -161,7 +161,7 @@ public type FieldRules record {|
 
 isolated function isValidFieldrules(FieldRules r) returns boolean {
     int typeCount = 0;
-    if !(r?.'enum is ()) {
+    if r?.'enum !is () {
         typeCount += 1;
     }
     if (typeCount > 1) {
