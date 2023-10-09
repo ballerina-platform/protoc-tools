@@ -157,7 +157,6 @@ public class GrpcCmd implements BLauncherCmd {
     }
 }
 
-
     private List<String> getProtoFiles(String path) throws IOException {
         if (path.endsWith("**.proto")) {
             try (Stream<Path> walk = Files.walk(Paths.get(path.substring(0, path.length() - 8)))) {
