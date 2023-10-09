@@ -46,8 +46,7 @@ import static io.ballerina.protoc.builder.syntaxtree.components.Expression.getBr
 import static io.ballerina.protoc.builder.syntaxtree.components.Expression.getFieldAccessExpressionNode;
 import static io.ballerina.protoc.builder.syntaxtree.components.Expression.getMethodCallExpressionNode;
 import static io.ballerina.protoc.builder.syntaxtree.components.Expression.getOptionalFieldAccessExpressionNode;
-import static io.ballerina.protoc.builder.syntaxtree.components.Expression.getTypeTestExpressionNode;
-import static io.ballerina.protoc.builder.syntaxtree.components.Expression.getUnaryExpressionNode;
+import static io.ballerina.protoc.builder.syntaxtree.components.Expression.getUnaryTypeTestExpressionNode;
 import static io.ballerina.protoc.builder.syntaxtree.components.Literal.getBooleanLiteralNode;
 import static io.ballerina.protoc.builder.syntaxtree.components.Literal.getNumericLiteralNode;
 import static io.ballerina.protoc.builder.syntaxtree.components.Statement.getCompoundAssignmentStatementNode;
@@ -247,14 +246,10 @@ public class MessageUtils {
             function.addVariableStatement(count.getVariableDeclarationNode());
             for (Field field : oneOfFieldMap.getValue()) {
                 IfElse oneOfFieldCheck = new IfElse(
-                        getUnaryExpressionNode(
-                                getBracedExpressionNode(
-                                        getTypeTestExpressionNode(
-                                                getOptionalFieldAccessExpressionNode("r", field.getFieldName()),
-                                                getNilTypeDescriptorNode()
-                                        )
-                                )
-                        )
+                    getUnaryTypeTestExpressionNode(
+                            getOptionalFieldAccessExpressionNode("r", field.getFieldName()),
+                            getNilTypeDescriptorNode()
+                    )
                 );
                 oneOfFieldCheck.addIfStatement(
                         getCompoundAssignmentStatementNode(

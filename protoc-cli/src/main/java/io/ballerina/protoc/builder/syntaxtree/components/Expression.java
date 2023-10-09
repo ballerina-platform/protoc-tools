@@ -234,6 +234,15 @@ public class Expression {
         );
     }
 
+    public static TypeTestExpressionNode getUnaryTypeTestExpressionNode(ExpressionNode expression,
+                                                                        Node typeDescriptor) {
+        return NodeFactory.createTypeTestExpressionNode(
+                expression,
+                SyntaxTreeConstants.SYNTAX_TREE_KEYWORD_NOT_IS,
+                typeDescriptor
+        );
+    }
+
     public static CheckExpressionNode getCheckExpressionNode(ExpressionNode expression) {
         return NodeFactory.createCheckExpressionNode(
                 SyntaxKind.CHECK_ACTION,
