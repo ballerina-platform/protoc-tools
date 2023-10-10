@@ -147,7 +147,8 @@ public class GrpcCmd implements BLauncherCmd {
             // Single proto file
             Optional<String> pathExtension = getFileExtension(protoPath);
             if (pathExtension.isEmpty() || !PROTO_EXTENSION.equalsIgnoreCase(pathExtension.get())) {
-                throw new RuntimeException("Invalid proto file path. Please input a valid proto file location.");
+                throw new RuntimeException("Input directory does not contain any proto files. " +
+            "Please input a valid proto files directory.");
             }
             generateBalFile(protoPath);
         }
