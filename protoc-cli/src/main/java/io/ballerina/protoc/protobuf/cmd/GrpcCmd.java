@@ -138,7 +138,8 @@ public class GrpcCmd implements BLauncherCmd {
             // Multiple proto files
             List<String> protoFiles = getProtoFiles(protoPath);
             if (protoFiles.isEmpty()) {
-                throw new RuntimeException("Input directory does not contain any proto files. Please input a valid proto files directory.");
+                throw new RuntimeException("Input directory does not contain any proto files. " +
+            "Please input a valid proto files directory.");
             }
             for (String protoFile : protoFiles) {
                 generateBalFile(protoFile);
