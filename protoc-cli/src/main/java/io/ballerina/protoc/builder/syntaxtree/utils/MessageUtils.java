@@ -42,7 +42,6 @@ import java.util.Map;
 
 import static io.ballerina.protoc.GrpcConstants.ANN_DESCRIPTOR;
 import static io.ballerina.protoc.builder.syntaxtree.components.Expression.getBinaryExpressionNode;
-import static io.ballerina.protoc.builder.syntaxtree.components.Expression.getBracedExpressionNode;
 import static io.ballerina.protoc.builder.syntaxtree.components.Expression.getFieldAccessExpressionNode;
 import static io.ballerina.protoc.builder.syntaxtree.components.Expression.getMethodCallExpressionNode;
 import static io.ballerina.protoc.builder.syntaxtree.components.Expression.getOptionalFieldAccessExpressionNode;
@@ -263,9 +262,7 @@ public class MessageUtils {
         }
         if (counts.size() > 0) {
             IfElse countCheck = new IfElse(
-                    getBracedExpressionNode(
-                            getCountCheckBinaryExpression(counts)
-                    )
+                    getCountCheckBinaryExpression(counts)
             );
             countCheck.addIfStatement(
                     getReturnStatementNode(

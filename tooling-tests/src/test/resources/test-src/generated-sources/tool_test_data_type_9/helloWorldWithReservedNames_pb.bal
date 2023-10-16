@@ -164,7 +164,7 @@ isolated function isValidFieldrules(FieldRules r) returns boolean {
     if r?.'enum !is () {
         typeCount += 1;
     }
-    if (typeCount > 1) {
+    if typeCount > 1 {
         return false;
     }
     return true;

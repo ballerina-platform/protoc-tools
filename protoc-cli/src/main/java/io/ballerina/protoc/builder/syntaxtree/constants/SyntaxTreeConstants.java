@@ -73,7 +73,7 @@ public class SyntaxTreeConstants {
     public static final Token SYNTAX_TREE_KEYWORD_IF = AbstractNodeFactory.createIdentifierToken("if ");
     public static final Token SYNTAX_TREE_KEYWORD_ELSE = AbstractNodeFactory.createIdentifierToken("else ");
     public static final Token SYNTAX_TREE_KEYWORD_IS = AbstractNodeFactory.createIdentifierToken("is ");
-    public static final Token SYNTAX_TREE_KEYWORD_NOT_IS = AbstractNodeFactory.createIdentifierToken("!is");
+    public static final Token SYNTAX_TREE_KEYWORD_NOT_IS = AbstractNodeFactory.createIdentifierToken("!is ");
     public static final Token SYNTAX_TREE_KEYWORD_LISTENER = AbstractNodeFactory.createIdentifierToken("listener ");
     public static final Token SYNTAX_TREE_KEYWORD_SERVICE = AbstractNodeFactory.createIdentifierToken("service ");
     public static final Token SYNTAX_TREE_KEYWORD_ON = AbstractNodeFactory.createIdentifierToken("on ");

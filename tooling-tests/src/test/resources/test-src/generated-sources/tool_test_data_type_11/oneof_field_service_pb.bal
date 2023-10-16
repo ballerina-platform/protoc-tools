@@ -185,7 +185,7 @@ isolated function isValidRequest1(Request1 r) returns boolean {
     if r?.'version !is () {
         nameCount += 1;
     }
-    if (otherCount > 1 || nameCount > 1) {
+    if otherCount > 1 || nameCount > 1 {
         return false;
     }
     return true;
@@ -241,7 +241,7 @@ isolated function isValidAddress1(Address1 r) returns boolean {
     if r?.street_number !is () {
         codeCount += 1;
     }
-    if (codeCount > 1) {
+    if codeCount > 1 {
         return false;
     }
     return true;
@@ -318,7 +318,7 @@ isolated function isValidZzz(ZZZ r) returns boolean {
     if r?.one_k !is () {
         valueCount += 1;
     }
-    if (valueCount > 1) {
+    if valueCount > 1 {
         return false;
     }
     return true;
