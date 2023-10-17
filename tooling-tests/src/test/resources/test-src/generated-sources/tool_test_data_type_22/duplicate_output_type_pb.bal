@@ -153,9 +153,9 @@ public class AlbumStream {
 
     public isolated function next() returns record {|Album value;|}|grpc:Error? {
         var streamValue = self.anydataStream.next();
-        if (streamValue is ()) {
+        if streamValue is () {
             return streamValue;
-        } else if (streamValue is grpc:Error) {
+        } else if streamValue is grpc:Error {
             return streamValue;
         } else {
             record {|Album value;|} nextRecord = {value: <Album>streamValue.value};
