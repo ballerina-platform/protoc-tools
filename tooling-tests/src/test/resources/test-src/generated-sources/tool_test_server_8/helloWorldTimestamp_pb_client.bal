@@ -208,9 +208,9 @@ public class GreetingStream {
 
     public isolated function next() returns record {|Greeting value;|}|grpc:Error? {
         var streamValue = self.anydataStream.next();
-        if (streamValue is ()) {
+        if streamValue is () {
             return streamValue;
-        } else if (streamValue is grpc:Error) {
+        } else if streamValue is grpc:Error {
             return streamValue;
         } else {
             record {|Greeting value;|} nextRecord = {value: <Greeting>streamValue.value};
