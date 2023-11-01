@@ -154,10 +154,16 @@ public class GrpcCmd implements BLauncherCmd {
             generateBalFile(protoPath);
         }
     } catch (Exception e) {
-        outStream.println("Error: " + e.getMessage());
+        handleException(e);
     }
 }
 
+ private void handleException(Exception e) {
+    // Log the exception or print a user-friendly error message
+    // If you want to suppress the stack trace, you can just print a custom error message here
+    outStream.println("Error: " + e.getMessage());
+}
+        
     private List<String> getProtoFiles(String path) throws IOException {
         if (path.endsWith("**.proto")) {
             try (Stream<Path> walk = Files.walk(Paths.get(path.substring(0, path.length() - 8)))) {
