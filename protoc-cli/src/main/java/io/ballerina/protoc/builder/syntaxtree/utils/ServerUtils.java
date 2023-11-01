@@ -34,7 +34,6 @@ import static io.ballerina.protoc.builder.BallerinaFileBuilder.componentsModuleM
 import static io.ballerina.protoc.builder.BallerinaFileBuilder.protofileModuleMap;
 import static io.ballerina.protoc.builder.balgen.BalGenConstants.COLON;
 import static io.ballerina.protoc.builder.balgen.BalGenConstants.PACKAGE_SEPARATOR;
-import static io.ballerina.protoc.builder.syntaxtree.components.Expression.getBracedExpressionNode;
 import static io.ballerina.protoc.builder.syntaxtree.components.Expression.getExplicitNewExpressionNode;
 import static io.ballerina.protoc.builder.syntaxtree.components.Expression.getFieldAccessExpressionNode;
 import static io.ballerina.protoc.builder.syntaxtree.components.Expression.getMethodCallExpressionNode;
@@ -228,11 +227,9 @@ public class ServerUtils {
         function.addVariableStatement(streamValue.getVariableDeclarationNode());
 
         IfElse streamValueNilCheck = new IfElse(
-                getBracedExpressionNode(
-                        getTypeTestExpressionNode(
-                                getSimpleNameReferenceNode("streamValue"),
-                                getNilTypeDescriptorNode()
-                        )
+                getTypeTestExpressionNode(
+                        getSimpleNameReferenceNode("streamValue"),
+                        getNilTypeDescriptorNode()
                 )
         );
         streamValueNilCheck.addIfStatement(
@@ -241,11 +238,9 @@ public class ServerUtils {
                 )
         );
         IfElse streamValueErrorCheck = new IfElse(
-                getBracedExpressionNode(
-                        getTypeTestExpressionNode(
-                                getSimpleNameReferenceNode("streamValue"),
-                                SyntaxTreeConstants.SYNTAX_TREE_GRPC_ERROR
-                        )
+                getTypeTestExpressionNode(
+                        getSimpleNameReferenceNode("streamValue"),
+                        SyntaxTreeConstants.SYNTAX_TREE_GRPC_ERROR
                 )
         );
         streamValueErrorCheck.addIfStatement(

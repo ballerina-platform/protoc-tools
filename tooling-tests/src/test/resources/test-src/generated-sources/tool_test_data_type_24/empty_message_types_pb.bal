@@ -361,9 +361,9 @@ public class EmptyStream {
 
     public isolated function next() returns record {|Empty value;|}|grpc:Error? {
         var streamValue = self.anydataStream.next();
-        if (streamValue is ()) {
+        if streamValue is () {
             return streamValue;
-        } else if (streamValue is grpc:Error) {
+        } else if streamValue is grpc:Error {
             return streamValue;
         } else {
             record {|Empty value;|} nextRecord = {value: <Empty>streamValue.value};

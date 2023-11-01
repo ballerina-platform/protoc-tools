@@ -53,9 +53,9 @@ public class ResMessageStream {
 
     public isolated function next() returns record {|ResMessage value;|}|grpc:Error? {
         var streamValue = self.anydataStream.next();
-        if (streamValue is ()) {
+        if streamValue is () {
             return streamValue;
-        } else if (streamValue is grpc:Error) {
+        } else if streamValue is grpc:Error {
             return streamValue;
         } else {
             record {|ResMessage value;|} nextRecord = {value: <ResMessage>streamValue.value};

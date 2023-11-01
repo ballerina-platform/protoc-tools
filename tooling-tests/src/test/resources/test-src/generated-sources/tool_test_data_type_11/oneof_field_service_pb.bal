@@ -166,26 +166,26 @@ public type Request1 record {|
 
 isolated function isValidRequest1(Request1 r) returns boolean {
     int otherCount = 0;
-    if !(r?.age is ()) {
+    if r?.age !is () {
         otherCount += 1;
     }
-    if !(r?.address is ()) {
+    if r?.address !is () {
         otherCount += 1;
     }
-    if !(r?.married is ()) {
+    if r?.married !is () {
         otherCount += 1;
     }
     int nameCount = 0;
-    if !(r?.first_name is ()) {
+    if r?.first_name !is () {
         nameCount += 1;
     }
-    if !(r?.last_name is ()) {
+    if r?.last_name !is () {
         nameCount += 1;
     }
-    if !(r?.'version is ()) {
+    if r?.'version !is () {
         nameCount += 1;
     }
-    if (otherCount > 1 || nameCount > 1) {
+    if otherCount > 1 || nameCount > 1 {
         return false;
     }
     return true;
@@ -235,13 +235,13 @@ public type Address1 record {|
 
 isolated function isValidAddress1(Address1 r) returns boolean {
     int codeCount = 0;
-    if !(r?.house_number is ()) {
+    if r?.house_number !is () {
         codeCount += 1;
     }
-    if !(r?.street_number is ()) {
+    if r?.street_number !is () {
         codeCount += 1;
     }
-    if (codeCount > 1) {
+    if codeCount > 1 {
         return false;
     }
     return true;
@@ -285,40 +285,40 @@ public type ZZZ record {|
 
 isolated function isValidZzz(ZZZ r) returns boolean {
     int valueCount = 0;
-    if !(r?.one_a is ()) {
+    if r?.one_a !is () {
         valueCount += 1;
     }
-    if !(r?.one_b is ()) {
+    if r?.one_b !is () {
         valueCount += 1;
     }
-    if !(r?.one_c is ()) {
+    if r?.one_c !is () {
         valueCount += 1;
     }
-    if !(r?.one_d is ()) {
+    if r?.one_d !is () {
         valueCount += 1;
     }
-    if !(r?.one_e is ()) {
+    if r?.one_e !is () {
         valueCount += 1;
     }
-    if !(r?.one_f is ()) {
+    if r?.one_f !is () {
         valueCount += 1;
     }
-    if !(r?.one_g is ()) {
+    if r?.one_g !is () {
         valueCount += 1;
     }
-    if !(r?.one_h is ()) {
+    if r?.one_h !is () {
         valueCount += 1;
     }
-    if !(r?.one_i is ()) {
+    if r?.one_i !is () {
         valueCount += 1;
     }
-    if !(r?.one_j is ()) {
+    if r?.one_j !is () {
         valueCount += 1;
     }
-    if !(r?.one_k is ()) {
+    if r?.one_k !is () {
         valueCount += 1;
     }
-    if (valueCount > 1) {
+    if valueCount > 1 {
         return false;
     }
     return true;
