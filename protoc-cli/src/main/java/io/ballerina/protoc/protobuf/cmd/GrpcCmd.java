@@ -153,8 +153,21 @@ public class GrpcCmd implements BLauncherCmd {
             }
             generateBalFile(protoPath);
         }
+    } catch (CodeGeneratorException e) {
+        // Handle CodeGeneratorException
+        String errorMessage = "An error occurred when generating the proto descriptor. " + e.getMessage();
+        LOG.error(errorMessage);
+        outStream.println(errorMessage);
+    } catch (IOException e) {
+        // Handle IO Exception
+        String errorMessage = "IO Error: " + e.getMessage();
+        LOG.error(errorMessage);
+        outStream.println(errorMessage);
     } catch (Exception e) {
-        handleException(e);
+        // Handle unexpected exceptions
+        String errorMessage = "Unexpected Error: " + e.getMessage();
+        LOG.error(errorMessage, e);
+        outStream.println(errorMessage);
     }
 }
 
