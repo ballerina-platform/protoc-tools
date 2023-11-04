@@ -153,9 +153,25 @@ public class GrpcCmd implements BLauncherCmd {
             }
             generateBalFile(protoPath);
         }
+    } catch (Exception e) {
+        // Handle other exceptions if needed
+        // You can choose to log, print, or handle them differently
+        outStream.println("Unexpected Error: " + e.getMessage());
+    }
+}
+private void generateBalFile(String protoFile) {
+    try {
+        // Your code to generate .bal file from the proto file
+
+        // If an error occurs during the descriptor generator phase, throw a CodeGeneratorException with a descriptive message.
+        if (errorOccurred) {
+            throw new CodeGeneratorException("An error occurred during code generation. Additional information here.");
+        }
+
+        // Rest of the code for successful generation
     } catch (CodeGeneratorException e) {
-        // Handle CodeGeneratorException
-        String errorMessage = "An error occurred when generating the proto descriptor. " + e.getMessage();
+        // Handle CodeGeneratorException without printing stack traces
+        String errorMessage = "Code Generation Error: " + e.getMessage();
         LOG.error(errorMessage);
         outStream.println(errorMessage);
     } catch (IOException e) {
