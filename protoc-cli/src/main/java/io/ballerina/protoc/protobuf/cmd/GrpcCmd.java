@@ -158,41 +158,7 @@ public class GrpcCmd implements BLauncherCmd {
         // You can choose to log, print, or handle them differently
         outStream.println("Unexpected Error: " + e.getMessage());
     }
-}
-private void generateBalFile(String protoFile) {
-    try {
-        // Your code to generate .bal file from the proto file
-
-        // If an error occurs during the descriptor generator phase, throw a CodeGeneratorException with a descriptive message.
-        if (errorOccurred) {
-            throw new CodeGeneratorException("An error occurred during code generation. Additional information here.");
-        }
-
-        // Rest of the code for successful generation
-    } catch (CodeGeneratorException e) {
-        // Handle CodeGeneratorException without printing stack traces
-        String errorMessage = "Code Generation Error: " + e.getMessage();
-        LOG.error(errorMessage);
-        outStream.println(errorMessage);
-    } catch (IOException e) {
-        // Handle IO Exception
-        String errorMessage = "IO Error: " + e.getMessage();
-        LOG.error(errorMessage);
-        outStream.println(errorMessage);
-    } catch (Exception e) {
-        // Handle unexpected exceptions
-        String errorMessage = "Unexpected Error: " + e.getMessage();
-        LOG.error(errorMessage, e);
-        outStream.println(errorMessage);
-    }
-}
-
- private void handleException(Exception e) {
-    // Log the exception or print a user-friendly error message
-    // If you want to suppress the stack trace, you can just print a custom error message here
-    outStream.println("Error: " + e.getMessage());
-}
-        
+}        
     private List<String> getProtoFiles(String path) throws IOException {
         if (path.endsWith("**.proto")) {
             try (Stream<Path> walk = Files.walk(Paths.get(path.substring(0, path.length() - 8)))) {
