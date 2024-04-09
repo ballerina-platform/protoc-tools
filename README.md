@@ -8,7 +8,7 @@ Ballerina Protoc-Tools
 
 Protoc-tools provides a CLI command to convert a protoc definition to a Ballerina representation that can be then used for connecting and interacting with gRPC endpoints.
 
-gRPC is an inter-process communication technology that allows you to connect, invoke, and operate distributed, heterogeneous applications as easily as making a local function call. The gRPC protocol is layered over HTTP/2 and uses Protocol Buffers for marshaling/unmarshaling messages. This makes gRPC highly efficient on wire and a simple service definition framework.
+gRPC is an inter-process communication technology that allows you to connect, invoke, and operate distributed, heterogeneous applications as easily as making a local function call. The gRPC protocol is layered over HTTP/2 and uses Protocol Buffs for marshaling/unmarshaling messages. This makes gRPC highly efficient on wire and a simple service definition framework.
 
 When you develop a gRPC application, the first thing you do is define a service definition using Protocol Buffers.
 
