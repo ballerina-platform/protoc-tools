@@ -42,8 +42,8 @@ public isolated client class helloWorldWithDependencyClient {
     }
 }
 
-public client class HelloWorldWithDependencyHelloResponseCaller {
-    private grpc:Caller caller;
+public isolated client class HelloWorldWithDependencyHelloResponseCaller {
+    private final grpc:Caller caller;
 
     public isolated function init(grpc:Caller caller) {
         self.caller = caller;

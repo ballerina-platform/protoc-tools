@@ -236,8 +236,8 @@ public isolated client class HelloWorld3Client {
     }
 }
 
-public client class HelloWorld3FloatCaller {
-    private grpc:Caller caller;
+public isolated client class HelloWorld3FloatCaller {
+    private final grpc:Caller caller;
 
     public isolated function init(grpc:Caller caller) {
         self.caller = caller;
@@ -268,8 +268,8 @@ public client class HelloWorld3FloatCaller {
     }
 }
 
-public client class HelloWorld3IntCaller {
-    private grpc:Caller caller;
+public isolated client class HelloWorld3IntCaller {
+    private final grpc:Caller caller;
 
     public isolated function init(grpc:Caller caller) {
         self.caller = caller;
@@ -300,8 +300,8 @@ public client class HelloWorld3IntCaller {
     }
 }
 
-public client class HelloWorld3TestFloatCaller {
-    private grpc:Caller caller;
+public isolated client class HelloWorld3TestFloatCaller {
+    private final grpc:Caller caller;
 
     public isolated function init(grpc:Caller caller) {
         self.caller = caller;
@@ -332,8 +332,8 @@ public client class HelloWorld3TestFloatCaller {
     }
 }
 
-public client class HelloWorld3TestBooleanCaller {
-    private grpc:Caller caller;
+public isolated client class HelloWorld3TestBooleanCaller {
+    private final grpc:Caller caller;
 
     public isolated function init(grpc:Caller caller) {
         self.caller = caller;
@@ -364,8 +364,8 @@ public client class HelloWorld3TestBooleanCaller {
     }
 }
 
-public client class HelloWorld3BooleanCaller {
-    private grpc:Caller caller;
+public isolated client class HelloWorld3BooleanCaller {
+    private final grpc:Caller caller;
 
     public isolated function init(grpc:Caller caller) {
         self.caller = caller;
@@ -396,8 +396,8 @@ public client class HelloWorld3BooleanCaller {
     }
 }
 
-public client class HelloWorld3TestIntCaller {
-    private grpc:Caller caller;
+public isolated client class HelloWorld3TestIntCaller {
+    private final grpc:Caller caller;
 
     public isolated function init(grpc:Caller caller) {
         self.caller = caller;
@@ -428,8 +428,8 @@ public client class HelloWorld3TestIntCaller {
     }
 }
 
-public client class HelloWorld3StringCaller {
-    private grpc:Caller caller;
+public isolated client class HelloWorld3StringCaller {
+    private final grpc:Caller caller;
 
     public isolated function init(grpc:Caller caller) {
         self.caller = caller;
@@ -460,8 +460,8 @@ public client class HelloWorld3StringCaller {
     }
 }
 
-public client class HelloWorld3TestStructCaller {
-    private grpc:Caller caller;
+public isolated client class HelloWorld3TestStructCaller {
+    private final grpc:Caller caller;
 
     public isolated function init(grpc:Caller caller) {
         self.caller = caller;
@@ -492,8 +492,8 @@ public client class HelloWorld3TestStructCaller {
     }
 }
 
-public client class HelloWorld3TestStringCaller {
-    private grpc:Caller caller;
+public isolated client class HelloWorld3TestStringCaller {
+    private final grpc:Caller caller;
 
     public isolated function init(grpc:Caller caller) {
         self.caller = caller;

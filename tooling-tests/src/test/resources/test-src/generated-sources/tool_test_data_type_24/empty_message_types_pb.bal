@@ -264,8 +264,8 @@ public isolated client class ServiceWithPredefinedNamesClient {
     }
 }
 
-public client class ClientCallEmptyInputStreamingClient {
-    private grpc:StreamingClient sClient;
+public isolated client class ClientCallEmptyInputStreamingClient {
+    private final grpc:StreamingClient sClient;
 
     isolated function init(grpc:StreamingClient sClient) {
         self.sClient = sClient;
@@ -308,8 +308,8 @@ public client class ClientCallEmptyInputStreamingClient {
     }
 }
 
-public client class ClientCallEmptyOutputStreamingClient {
-    private grpc:StreamingClient sClient;
+public isolated client class ClientCallEmptyOutputStreamingClient {
+    private final grpc:StreamingClient sClient;
 
     isolated function init(grpc:StreamingClient sClient) {
         self.sClient = sClient;
@@ -376,8 +376,8 @@ public class EmptyStream {
     }
 }
 
-public client class BidiCallEmptyInputStreamingClient {
-    private grpc:StreamingClient sClient;
+public isolated client class BidiCallEmptyInputStreamingClient {
+    private final grpc:StreamingClient sClient;
 
     isolated function init(grpc:StreamingClient sClient) {
         self.sClient = sClient;
@@ -420,8 +420,8 @@ public client class BidiCallEmptyInputStreamingClient {
     }
 }
 
-public client class BidiCallEmptyOutputStreamingClient {
-    private grpc:StreamingClient sClient;
+public isolated client class BidiCallEmptyOutputStreamingClient {
+    private final grpc:StreamingClient sClient;
 
     isolated function init(grpc:StreamingClient sClient) {
         self.sClient = sClient;
@@ -464,8 +464,8 @@ public client class BidiCallEmptyOutputStreamingClient {
     }
 }
 
-public client class ServiceWithPredefinedNamesTimestampCaller {
-    private grpc:Caller caller;
+public isolated client class ServiceWithPredefinedNamesTimestampCaller {
+    private final grpc:Caller caller;
 
     public isolated function init(grpc:Caller caller) {
         self.caller = caller;
@@ -496,8 +496,8 @@ public client class ServiceWithPredefinedNamesTimestampCaller {
     }
 }
 
-public client class ServiceWithPredefinedNamesAnyCaller {
-    private grpc:Caller caller;
+public isolated client class ServiceWithPredefinedNamesAnyCaller {
+    private final grpc:Caller caller;
 
     public isolated function init(grpc:Caller caller) {
         self.caller = caller;
@@ -528,8 +528,8 @@ public client class ServiceWithPredefinedNamesAnyCaller {
     }
 }
 
-public client class ServiceWithPredefinedNamesStringCaller {
-    private grpc:Caller caller;
+public isolated client class ServiceWithPredefinedNamesStringCaller {
+    private final grpc:Caller caller;
 
     public isolated function init(grpc:Caller caller) {
         self.caller = caller;
@@ -560,8 +560,8 @@ public client class ServiceWithPredefinedNamesStringCaller {
     }
 }
 
-public client class ServiceWithPredefinedNamesStructCaller {
-    private grpc:Caller caller;
+public isolated client class ServiceWithPredefinedNamesStructCaller {
+    private final grpc:Caller caller;
 
     public isolated function init(grpc:Caller caller) {
         self.caller = caller;
@@ -592,8 +592,8 @@ public client class ServiceWithPredefinedNamesStructCaller {
     }
 }
 
-public client class ServiceWithPredefinedNamesDurationCaller {
-    private grpc:Caller caller;
+public isolated client class ServiceWithPredefinedNamesDurationCaller {
+    private final grpc:Caller caller;
 
     public isolated function init(grpc:Caller caller) {
         self.caller = caller;
@@ -624,8 +624,8 @@ public client class ServiceWithPredefinedNamesDurationCaller {
     }
 }
 
-public client class ServiceWithPredefinedNamesEmptyCaller {
-    private grpc:Caller caller;
+public isolated client class ServiceWithPredefinedNamesEmptyCaller {
+    private final grpc:Caller caller;
 
     public isolated function init(grpc:Caller caller) {
         self.caller = caller;

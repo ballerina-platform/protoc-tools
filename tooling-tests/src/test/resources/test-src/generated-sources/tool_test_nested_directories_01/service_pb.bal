@@ -42,8 +42,8 @@ public isolated client class MyServiceClient {
     }
 }
 
-public client class MyServiceMainMessageCaller {
-    private grpc:Caller caller;
+public isolated client class MyServiceMainMessageCaller {
+    private final grpc:Caller caller;
 
     public isolated function init(grpc:Caller caller) {
         self.caller = caller;

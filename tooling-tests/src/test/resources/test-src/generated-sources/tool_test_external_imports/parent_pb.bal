@@ -82,8 +82,8 @@ public isolated client class ParentTestClient {
     }
 }
 
-public client class CallParent2StreamingClient {
-    private grpc:StreamingClient sClient;
+public isolated client class CallParent2StreamingClient {
+    private final grpc:StreamingClient sClient;
 
     isolated function init(grpc:StreamingClient sClient) {
         self.sClient = sClient;
@@ -150,8 +150,8 @@ public class ParentMessageStream {
     }
 }
 
-public client class CallParent4StreamingClient {
-    private grpc:StreamingClient sClient;
+public isolated client class CallParent4StreamingClient {
+    private final grpc:StreamingClient sClient;
 
     isolated function init(grpc:StreamingClient sClient) {
         self.sClient = sClient;
@@ -194,8 +194,8 @@ public client class CallParent4StreamingClient {
     }
 }
 
-public client class ParentTestParentMessageCaller {
-    private grpc:Caller caller;
+public isolated client class ParentTestParentMessageCaller {
+    private final grpc:Caller caller;
 
     public isolated function init(grpc:Caller caller) {
         self.caller = caller;

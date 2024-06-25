@@ -71,8 +71,8 @@ public isolated client class MyServiceClient {
     }
 }
 
-public client class MyServiceMessage2Caller {
-    private grpc:Caller caller;
+public isolated client class MyServiceMessage2Caller {
+    private final grpc:Caller caller;
 
     public isolated function init(grpc:Caller caller) {
         self.caller = caller;
@@ -103,8 +103,8 @@ public client class MyServiceMessage2Caller {
     }
 }
 
-public client class MyServiceMainMessageCaller {
-    private grpc:Caller caller;
+public isolated client class MyServiceMainMessageCaller {
+    private final grpc:Caller caller;
 
     public isolated function init(grpc:Caller caller) {
         self.caller = caller;

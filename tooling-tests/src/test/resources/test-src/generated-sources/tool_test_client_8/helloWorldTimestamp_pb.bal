@@ -47,8 +47,8 @@ public isolated client class helloWorldClient {
     }
 }
 
-public client class GetTimeStreamingClient {
-    private grpc:StreamingClient sClient;
+public isolated client class GetTimeStreamingClient {
+    private final grpc:StreamingClient sClient;
 
     isolated function init(grpc:StreamingClient sClient) {
         self.sClient = sClient;
@@ -91,8 +91,8 @@ public client class GetTimeStreamingClient {
     }
 }
 
-public client class SendTimeStreamingClient {
-    private grpc:StreamingClient sClient;
+public isolated client class SendTimeStreamingClient {
+    private final grpc:StreamingClient sClient;
 
     isolated function init(grpc:StreamingClient sClient) {
         self.sClient = sClient;
@@ -135,8 +135,8 @@ public client class SendTimeStreamingClient {
     }
 }
 
-public client class ExchangeTimeStreamingClient {
-    private grpc:StreamingClient sClient;
+public isolated client class ExchangeTimeStreamingClient {
+    private final grpc:StreamingClient sClient;
 
     isolated function init(grpc:StreamingClient sClient) {
         self.sClient = sClient;
@@ -179,8 +179,8 @@ public client class ExchangeTimeStreamingClient {
     }
 }
 
-public client class GetGreetingStreamingClient {
-    private grpc:StreamingClient sClient;
+public isolated client class GetGreetingStreamingClient {
+    private final grpc:StreamingClient sClient;
 
     isolated function init(grpc:StreamingClient sClient) {
         self.sClient = sClient;
@@ -223,8 +223,8 @@ public client class GetGreetingStreamingClient {
     }
 }
 
-public client class SendGreetingStreamingClient {
-    private grpc:StreamingClient sClient;
+public isolated client class SendGreetingStreamingClient {
+    private final grpc:StreamingClient sClient;
 
     isolated function init(grpc:StreamingClient sClient) {
         self.sClient = sClient;
@@ -267,8 +267,8 @@ public client class SendGreetingStreamingClient {
     }
 }
 
-public client class ExchangeGreetingStreamingClient {
-    private grpc:StreamingClient sClient;
+public isolated client class ExchangeGreetingStreamingClient {
+    private final grpc:StreamingClient sClient;
 
     isolated function init(grpc:StreamingClient sClient) {
         self.sClient = sClient;
@@ -311,8 +311,8 @@ public client class ExchangeGreetingStreamingClient {
     }
 }
 
-public client class HelloWorldStringCaller {
-    private grpc:Caller caller;
+public isolated client class HelloWorldStringCaller {
+    private final grpc:Caller caller;
 
     public isolated function init(grpc:Caller caller) {
         self.caller = caller;
@@ -343,8 +343,8 @@ public client class HelloWorldStringCaller {
     }
 }
 
-public client class HelloWorldGreetingCaller {
-    private grpc:Caller caller;
+public isolated client class HelloWorldGreetingCaller {
+    private final grpc:Caller caller;
 
     public isolated function init(grpc:Caller caller) {
         self.caller = caller;
@@ -375,8 +375,8 @@ public client class HelloWorldGreetingCaller {
     }
 }
 
-public client class HelloWorldTimestampCaller {
-    private grpc:Caller caller;
+public isolated client class HelloWorldTimestampCaller {
+    private final grpc:Caller caller;
 
     public isolated function init(grpc:Caller caller) {
         self.caller = caller;

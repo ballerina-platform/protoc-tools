@@ -105,8 +105,8 @@ public isolated client class helloWorldClient {
     }
 }
 
-public client class Hello3StreamingClient {
-    private grpc:StreamingClient sClient;
+public isolated client class Hello3StreamingClient {
+    private final grpc:StreamingClient sClient;
 
     isolated function init(grpc:StreamingClient sClient) {
         self.sClient = sClient;
@@ -173,8 +173,8 @@ public class ResMessageStream {
     }
 }
 
-public client class HelloStreamingClient {
-    private grpc:StreamingClient sClient;
+public isolated client class HelloStreamingClient {
+    private final grpc:StreamingClient sClient;
 
     isolated function init(grpc:StreamingClient sClient) {
         self.sClient = sClient;
@@ -217,8 +217,8 @@ public client class HelloStreamingClient {
     }
 }
 
-public client class Hello4StreamingClient {
-    private grpc:StreamingClient sClient;
+public isolated client class Hello4StreamingClient {
+    private final grpc:StreamingClient sClient;
 
     isolated function init(grpc:StreamingClient sClient) {
         self.sClient = sClient;
@@ -261,8 +261,8 @@ public client class Hello4StreamingClient {
     }
 }
 
-public client class Hello5StreamingClient {
-    private grpc:StreamingClient sClient;
+public isolated client class Hello5StreamingClient {
+    private final grpc:StreamingClient sClient;
 
     isolated function init(grpc:StreamingClient sClient) {
         self.sClient = sClient;
@@ -305,8 +305,8 @@ public client class Hello5StreamingClient {
     }
 }
 
-public client class Hello10StreamingClient {
-    private grpc:StreamingClient sClient;
+public isolated client class Hello10StreamingClient {
+    private final grpc:StreamingClient sClient;
 
     isolated function init(grpc:StreamingClient sClient) {
         self.sClient = sClient;
@@ -349,8 +349,8 @@ public client class Hello10StreamingClient {
     }
 }
 
-public client class Hello11StreamingClient {
-    private grpc:StreamingClient sClient;
+public isolated client class Hello11StreamingClient {
+    private final grpc:StreamingClient sClient;
 
     isolated function init(grpc:StreamingClient sClient) {
         self.sClient = sClient;
