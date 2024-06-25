@@ -109,12 +109,12 @@ public class ClientUtils {
         String name = method.getMethodName().substring(0, 1).toUpperCase() + method.getMethodName().substring(1) +
                 STREAMING_CLIENT;
         Class streamingClient = new Class(name, true);
-        streamingClient.addQualifiers(new String[]{"client"});
+        streamingClient.addQualifiers(new String[]{"isolated", "client"});
 
         streamingClient.addMember(
                 getObjectFieldNode(
                         "private",
-                        new String[]{},
+                        new String[]{"final"},
                         getQualifiedNameReferenceNode("grpc", STREAMING_CLIENT),
                         "sClient"));
 
