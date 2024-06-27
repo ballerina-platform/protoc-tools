@@ -82,8 +82,8 @@ public isolated client class helloBallerinaClient {
     }
 }
 
-public client class HelloStreamingClient {
-    private grpc:StreamingClient sClient;
+public isolated client class HelloStreamingClient {
+    private final grpc:StreamingClient sClient;
 
     isolated function init(grpc:StreamingClient sClient) {
         self.sClient = sClient;
@@ -150,8 +150,8 @@ public class ResMessageStream {
     }
 }
 
-public client class ByeStreamingClient {
-    private grpc:StreamingClient sClient;
+public isolated client class ByeStreamingClient {
+    private final grpc:StreamingClient sClient;
 
     isolated function init(grpc:StreamingClient sClient) {
         self.sClient = sClient;
@@ -194,8 +194,8 @@ public client class ByeStreamingClient {
     }
 }
 
-public client class HelloBallerinaResMessageCaller {
-    private grpc:Caller caller;
+public isolated client class HelloBallerinaResMessageCaller {
+    private final grpc:Caller caller;
 
     public isolated function init(grpc:Caller caller) {
         self.caller = caller;

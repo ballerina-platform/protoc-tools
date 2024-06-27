@@ -223,8 +223,8 @@ public class GreetingStream {
     }
 }
 
-public client class HelloWorldStringCaller {
-    private grpc:Caller caller;
+public isolated client class HelloWorldStringCaller {
+    private final grpc:Caller caller;
 
     public isolated function init(grpc:Caller caller) {
         self.caller = caller;
@@ -255,8 +255,8 @@ public client class HelloWorldStringCaller {
     }
 }
 
-public client class HelloWorldGreetingCaller {
-    private grpc:Caller caller;
+public isolated client class HelloWorldGreetingCaller {
+    private final grpc:Caller caller;
 
     public isolated function init(grpc:Caller caller) {
         self.caller = caller;
@@ -287,8 +287,8 @@ public client class HelloWorldGreetingCaller {
     }
 }
 
-public client class HelloWorldTimestampCaller {
-    private grpc:Caller caller;
+public isolated client class HelloWorldTimestampCaller {
+    private final grpc:Caller caller;
 
     public isolated function init(grpc:Caller caller) {
         self.caller = caller;

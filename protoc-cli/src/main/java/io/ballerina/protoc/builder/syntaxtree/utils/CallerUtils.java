@@ -51,12 +51,12 @@ public class CallerUtils {
 
     public static Class getCallerClass(String key, String value, String filename) {
         Class caller = new Class(key, true);
-        caller.addQualifiers(new String[]{"client"});
+        caller.addQualifiers(new String[]{"isolated", "client"});
 
         caller.addMember(
                 getObjectFieldNode(
                         "private",
-                        new String[]{},
+                        new String[]{"final"},
                         getQualifiedNameReferenceNode("grpc", "Caller"),
                         "caller"
                 )

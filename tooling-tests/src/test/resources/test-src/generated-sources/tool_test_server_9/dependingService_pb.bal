@@ -68,8 +68,8 @@ public class ResMessageStream {
     }
 }
 
-public client class HelloWorldResMessageCaller {
-    private grpc:Caller caller;
+public isolated client class HelloWorldResMessageCaller {
+    private final grpc:Caller caller;
 
     public isolated function init(grpc:Caller caller) {
         self.caller = caller;

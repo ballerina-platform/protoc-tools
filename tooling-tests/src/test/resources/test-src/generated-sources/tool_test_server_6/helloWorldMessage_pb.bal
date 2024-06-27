@@ -122,8 +122,8 @@ public class ByeResponseStream {
     }
 }
 
-public client class HelloWorldByeResponseCaller {
-    private grpc:Caller caller;
+public isolated client class HelloWorldByeResponseCaller {
+    private final grpc:Caller caller;
 
     public isolated function init(grpc:Caller caller) {
         self.caller = caller;
@@ -154,8 +154,8 @@ public client class HelloWorldByeResponseCaller {
     }
 }
 
-public client class HelloWorldHelloResponseCaller {
-    private grpc:Caller caller;
+public isolated client class HelloWorldHelloResponseCaller {
+    private final grpc:Caller caller;
 
     public isolated function init(grpc:Caller caller) {
         self.caller = caller;

@@ -70,8 +70,8 @@ public isolated client class helloWorldWithReservedNamesClient {
     }
 }
 
-public client class HelloWorldWithReservedNamesHelloResponseCaller {
-    private grpc:Caller caller;
+public isolated client class HelloWorldWithReservedNamesHelloResponseCaller {
+    private final grpc:Caller caller;
 
     public isolated function init(grpc:Caller caller) {
         self.caller = caller;
@@ -102,8 +102,8 @@ public client class HelloWorldWithReservedNamesHelloResponseCaller {
     }
 }
 
-public client class HelloWorldWithReservedNamesByeResponseCaller {
-    private grpc:Caller caller;
+public isolated client class HelloWorldWithReservedNamesByeResponseCaller {
+    private final grpc:Caller caller;
 
     public isolated function init(grpc:Caller caller) {
         self.caller = caller;

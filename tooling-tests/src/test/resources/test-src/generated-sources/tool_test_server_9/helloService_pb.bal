@@ -42,8 +42,8 @@ public isolated client class helloBallerinaClient {
     }
 }
 
-public client class HelloBallerinaResMessageCaller {
-    private grpc:Caller caller;
+public isolated client class HelloBallerinaResMessageCaller {
+    private final grpc:Caller caller;
 
     public isolated function init(grpc:Caller caller) {
         self.caller = caller;

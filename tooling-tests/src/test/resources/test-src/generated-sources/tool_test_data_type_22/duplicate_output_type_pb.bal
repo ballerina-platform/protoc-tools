@@ -100,8 +100,8 @@ public isolated client class RecordStoreClient {
     }
 }
 
-public client class GetTotalValueStreamingClient {
-    private grpc:StreamingClient sClient;
+public isolated client class GetTotalValueStreamingClient {
+    private final grpc:StreamingClient sClient;
 
     isolated function init(grpc:StreamingClient sClient) {
         self.sClient = sClient;
@@ -168,8 +168,8 @@ public class AlbumStream {
     }
 }
 
-public client class UpdateAlbumsStreamingClient {
-    private grpc:StreamingClient sClient;
+public isolated client class UpdateAlbumsStreamingClient {
+    private final grpc:StreamingClient sClient;
 
     isolated function init(grpc:StreamingClient sClient) {
         self.sClient = sClient;
@@ -212,8 +212,8 @@ public client class UpdateAlbumsStreamingClient {
     }
 }
 
-public client class RecordStoreIntCaller {
-    private grpc:Caller caller;
+public isolated client class RecordStoreIntCaller {
+    private final grpc:Caller caller;
 
     public isolated function init(grpc:Caller caller) {
         self.caller = caller;
@@ -244,8 +244,8 @@ public client class RecordStoreIntCaller {
     }
 }
 
-public client class RecordStoreAlbumCaller {
-    private grpc:Caller caller;
+public isolated client class RecordStoreAlbumCaller {
+    private final grpc:Caller caller;
 
     public isolated function init(grpc:Caller caller) {
         self.caller = caller;

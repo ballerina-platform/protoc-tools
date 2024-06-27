@@ -20,8 +20,8 @@ public isolated client class helloWorldClient {
     }
 }
 
-public client class TestInputStructNoOutputStreamingClient {
-    private grpc:StreamingClient sClient;
+public isolated client class TestInputStructNoOutputStreamingClient {
+    private final grpc:StreamingClient sClient;
 
     isolated function init(grpc:StreamingClient sClient) {
         self.sClient = sClient;

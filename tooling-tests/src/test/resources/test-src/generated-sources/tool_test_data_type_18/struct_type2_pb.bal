@@ -83,8 +83,8 @@ public isolated client class StructHandlerClient {
     }
 }
 
-public client class ClientStreamingStreamingClient {
-    private grpc:StreamingClient sClient;
+public isolated client class ClientStreamingStreamingClient {
+    private final grpc:StreamingClient sClient;
 
     isolated function init(grpc:StreamingClient sClient) {
         self.sClient = sClient;
@@ -127,8 +127,8 @@ public client class ClientStreamingStreamingClient {
     }
 }
 
-public client class BidirectionalStreamingStreamingClient {
-    private grpc:StreamingClient sClient;
+public isolated client class BidirectionalStreamingStreamingClient {
+    private final grpc:StreamingClient sClient;
 
     isolated function init(grpc:StreamingClient sClient) {
         self.sClient = sClient;
@@ -171,8 +171,8 @@ public client class BidirectionalStreamingStreamingClient {
     }
 }
 
-public client class StructHandlerStructCaller {
-    private grpc:Caller caller;
+public isolated client class StructHandlerStructCaller {
+    private final grpc:Caller caller;
 
     public isolated function init(grpc:Caller caller) {
         self.caller = caller;
