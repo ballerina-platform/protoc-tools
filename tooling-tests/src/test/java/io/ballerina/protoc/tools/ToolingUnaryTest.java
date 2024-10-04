@@ -96,4 +96,11 @@ public class ToolingUnaryTest {
                 "helloWorldTimestamp_pb.bal", "helloworld_service.bal",
                 "helloworld_client.bal", "tool_test_unary_10");
     }
+
+    @Test
+    public void testUnaryWithEmptyFieldMessage() {
+        assertGeneratedSources("unary", "emptyFieldMessage.proto",
+                "emptyFieldMessage_pb.bal", "testservice_service.bal",
+                "testservice_client.bal", "tool_test_unary_11");
+    }
 }
