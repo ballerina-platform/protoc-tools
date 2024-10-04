@@ -120,7 +120,7 @@ public class Field {
                 fieldDefaultValue = fieldLabel;
             }
             String fieldName = fieldDescriptor.getName();
-            if (Arrays.stream(RESERVED_LITERAL_NAMES).anyMatch(fieldName::equalsIgnoreCase) || Names.ERROR.value
+            if (Arrays.stream(RESERVED_LITERAL_NAMES).anyMatch(fieldName::equalsIgnoreCase) || Names.ERROR.getValue()
                     .equalsIgnoreCase(fieldName)) {
                 fieldName = "'" + fieldName;
             }
