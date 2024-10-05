@@ -28,4 +28,5 @@ module io.ballerina.protoc {
     requires info.picocli;
     requires org.slf4j;
     requires org.apache.commons.lang3;
+    requires protobuf.java;
 }

@@ -137,7 +137,7 @@ public class Field {
 
         private Builder(DescriptorProtos.FieldDescriptorProto fieldDescriptor, String fieldType) {
             this.fieldDescriptor = fieldDescriptor;
-            this.type = fieldType;
+            this.type = fieldType != null ? fieldType : "empty:Empty";
         }
     }
 
