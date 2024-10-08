@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - [Fix the NPE when there is message field type of google.protobuf.Empty](https://github.com/ballerina-platform/ballerina-library/issues/7230)
-- [[Fix the issue in showing the actual error message](https://github.com/ballerina-platform/ballerina-library/issues/7238)
+- [Fix the issue in showing the actual error message](https://github.com/ballerina-platform/ballerina-library/issues/7238)
 
 
 ## [0.3.0] - 2024-06-27
