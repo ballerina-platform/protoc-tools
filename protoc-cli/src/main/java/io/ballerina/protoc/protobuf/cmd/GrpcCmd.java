@@ -264,14 +264,14 @@ public class GrpcCmd implements BLauncherCmd {
                 }
             } catch (CodeGeneratorException e) {
                 String errorMessage = "An error occurred when generating the proto descriptor. " + e.getMessage();
-                LOG.error("An error occurred when generating the proto descriptor.", e);
                 outStream.println(errorMessage);
+                LOG.error("An error occurred when generating the proto descriptor.", e);
                 return;
             }
             if (root.getDescriptor().length == 0) {
                 String errorMsg = "An error occurred when generating the proto descriptor.";
-                LOG.error(errorMsg);
                 outStream.println(errorMsg);
+                LOG.error(errorMsg);
                 return;
             }
             LOG.debug("Successfully generated the root descriptor.");
@@ -292,8 +292,8 @@ public class GrpcCmd implements BLauncherCmd {
             } catch (CodeGeneratorException e) {
                 String errorMessage =
                         "An error occurred when generating the dependent proto descriptor. " + e.getMessage();
-                LOG.error(errorMessage, e);
                 outStream.println(errorMessage);
+                LOG.error(errorMessage, e);
                 return;
             }
             LOG.debug("Successfully generated the dependent descriptor.");
@@ -316,10 +316,10 @@ public class GrpcCmd implements BLauncherCmd {
             }
             ballerinaFileBuilder.build(this.mode);
         } catch (CodeBuilderException | CodeGeneratorException | IOException e) {
-            LOG.error("Error generating the Ballerina file.", e);
             msg.append("Error generating the Ballerina file.").append(e.getMessage())
                     .append(BalGenerationConstants.NEW_LINE_CHARACTER);
             outStream.println(msg);
+            LOG.error("Error generating the Ballerina file.", e);
             return;
         }
         msg.append("Successfully generated the Ballerina file.").append(BalGenerationConstants.NEW_LINE_CHARACTER);
