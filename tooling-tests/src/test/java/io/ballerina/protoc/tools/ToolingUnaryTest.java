@@ -20,6 +20,7 @@ package io.ballerina.protoc.tools;
 
 import org.testng.annotations.Test;
 
+import static io.ballerina.protoc.tools.ToolingTestUtils.assertGeneratedDataTypeSourcesNegative;
 import static io.ballerina.protoc.tools.ToolingTestUtils.assertGeneratedSources;
 
 /**
@@ -102,5 +103,11 @@ public class ToolingUnaryTest {
         assertGeneratedSources("unary", "emptyFieldMessage.proto",
                 "emptyFieldMessage_pb.bal", "testservice_service.bal",
                 "testservice_client.bal", "tool_test_unary_11");
+    }
+
+    @Test
+    public void testUnaryWithSchemaSyntaxErrors() {
+        assertGeneratedDataTypeSourcesNegative("unary", "schemaSyntaxErrors.proto",
+                "schemaSyntaxErrors_pb.bal",  "tool_test_unary_12");
     }
 }

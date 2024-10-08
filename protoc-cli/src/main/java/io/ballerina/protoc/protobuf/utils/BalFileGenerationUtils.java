@@ -80,7 +80,11 @@ public class BalFileGenerationUtils {
                     " running the protoc executor. " + e.getMessage(), e);
         }
         if (process.exitValue() != 0) {
-            handleProcessExecutionErrors(process);
+            StringBuilder errMsg = new StringBuilder();
+            for (String line : output) {
+                errMsg.append(line).append(System.lineSeparator());
+            }
+            throw new CodeGeneratorException("Process exited with the following output: \n" + errMsg);
         }
         return output;
     }
