@@ -347,4 +347,39 @@ public class ToolingCommonTest {
         assertGeneratedSources("data-types/enum_imports", "child.proto",
                 "child_pb.bal", "helloworld_service.bal", "helloworld_client.bal", "tool_test_data_type_26");
     }
+
+    @Test
+    public void testGeneratedFileNewlines() {
+        try {
+            Files.createDirectories(Paths.get(GENERATED_SOURCES_DIRECTORY, "tool_test_newline_test"));
+        } catch (IOException e) {
+            Assert.fail("Could not create target directories", e);
+        }
+
+        Path protoFilePath = Paths.get(RESOURCE_DIRECTORY.toString(), PROTO_FILE_DIRECTORY, "data-types", 
+                "message.proto");
+        Path outputDirPath = Paths.get(GENERATED_SOURCES_DIRECTORY, "tool_test_newline_test");
+        Path generatedFile = outputDirPath.resolve("message_pb.bal");
+
+        generateSourceCode(protoFilePath, outputDirPath, null, null);
+        Assert.assertTrue(Files.exists(generatedFile), "Generated file does not exist");
+
+        try {
+            String content = Files.readString(generatedFile);
+            int newlineCount = 0;
+            int index = content.length() - 1;
+                
+            // check for newlines at the end of the file
+            while (index >= 0 && content.charAt(index) == '\n') {
+                newlineCount++;
+                index--;
+            }
+                
+            // if the newline count is not 1, fail the test
+            Assert.assertEquals(newlineCount, 1, 
+                "Generated file should have exactly one newline at the end, found " + newlineCount);
+        } catch (IOException e) {
+            Assert.fail("Failed to read generated file", e);
+        }
+    }
 }

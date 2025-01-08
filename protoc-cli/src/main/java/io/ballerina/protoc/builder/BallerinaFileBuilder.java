@@ -396,7 +396,7 @@ public class BallerinaFileBuilder {
             throw new CodeBuilderException("Formatter Error while formatting output source code. " + e.getMessage(), e);
         }
         try (PrintWriter writer = new PrintWriter(outPath, StandardCharsets.UTF_8.name())) {
-            writer.println(content);
+            writer.print(content); 
         } catch (IOException e) {
             throw new CodeBuilderException("IO Error while writing output to Ballerina file. " + e.getMessage(), e);
         }
