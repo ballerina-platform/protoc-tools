@@ -351,9 +351,9 @@ public class ToolingCommonTest {
     @Test
     public void testGeneratedFileNewlines() {
         try {
-                Files.createDirectories(Paths.get(GENERATED_SOURCES_DIRECTORY, "tool_test_newline_test"));
+            Files.createDirectories(Paths.get(GENERATED_SOURCES_DIRECTORY, "tool_test_newline_test"));
         } catch (IOException e) {
-                Assert.fail("Could not create target directories", e);
+            Assert.fail("Could not create target directories", e);
         }
 
         Path protoFilePath = Paths.get(RESOURCE_DIRECTORY.toString(), PROTO_FILE_DIRECTORY, "data-types", 
@@ -365,21 +365,21 @@ public class ToolingCommonTest {
         Assert.assertTrue(Files.exists(generatedFile), "Generated file does not exist");
 
         try {
-                String content = Files.readString(generatedFile);
-                int newlineCount = 0;
-                int index = content.length() - 1;
+            String content = Files.readString(generatedFile);
+            int newlineCount = 0;
+            int index = content.length() - 1;
                 
-                // check for newlines at the end of the file
-                while (index >= 0 && content.charAt(index) == '\n') {
+            // check for newlines at the end of the file
+            while (index >= 0 && content.charAt(index) == '\n') {
                 newlineCount++;
                 index--;
-                }
+            }
                 
-                //if the newline count is not 1, fail the test
-                Assert.assertEquals(newlineCount, 1, 
+            // if the newline count is not 1, fail the test
+            Assert.assertEquals(newlineCount, 1, 
                 "Generated file should have exactly one newline at the end, found " + newlineCount);
         } catch (IOException e) {
-                Assert.fail("Failed to read generated file", e);
+            Assert.fail("Failed to read generated file", e);
         }
     }
 }
