@@ -39,6 +39,7 @@ dependencies {
     checkstyle project(':checkstyle')
     checkstyle "com.puppycrawl.tools:checkstyle:${checkstylePluginVersion}"
 
+    testImplementation project(':protoc-core')
     testImplementation group: 'org.ballerinalang', name: 'ballerina-runtime', version: "${ballerinaLangVersion}"
     testImplementation group: 'org.ballerinalang', name: 'ballerina-tools-api', version: "${ballerinaLangVersion}"
     testImplementation (group: 'org.ballerinalang', name: 'ballerina-cli', version: "${ballerinaLangVersion}") {

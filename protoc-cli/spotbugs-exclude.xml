@@ -17,12 +17,12 @@
   -->
 <FindBugsFilter>
     <Match>
-        <Class name="io.ballerina.protoc.protobuf.cmd.GrpcCmd" />
+        <Class name="io.ballerina.protoc.cli.GrpcCmd" />
         <Method name="readProperties" />
         <Bug pattern="RCN_REDUNDANT_NULLCHECK_WOULD_HAVE_BEEN_A_NPE" />
     </Match>
     <Match>
-        <Class name="io.ballerina.protoc.protobuf.cmd.GrpcCmd" />
+        <Class name="io.ballerina.protoc.cli.GrpcCmd" />
         <Method name="exportResource" />
         <Bug pattern="RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE" />
     </Match>

@@ -24,7 +24,7 @@ import io.ballerina.projects.Package;
 import io.ballerina.projects.PackageCompilation;
 import io.ballerina.projects.directory.BuildProject;
 import io.ballerina.projects.directory.SingleFileProject;
-import io.ballerina.protoc.protobuf.cmd.GrpcCmd;
+import io.ballerina.protoc.cli.GrpcCmd;
 import io.ballerina.tools.text.TextDocument;
 import io.ballerina.tools.text.TextDocuments;
 import org.testng.Assert;
@@ -36,7 +36,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 
-import static io.ballerina.protoc.builder.balgen.BalGenConstants.FILE_SEPARATOR;
+import static io.ballerina.protoc.core.builder.balgen.BalGenConstants.FILE_SEPARATOR;
 
 /**
  * gRPC tool test Utils.
@@ -174,7 +174,7 @@ public class ToolingTestUtils {
             protocOutputDirPath = Paths.get(GENERATED_SOURCES_DIRECTORY, outputDir);
         }
         try {
-            Class<?> grpcCmdClass = Class.forName("io.ballerina.protoc.protobuf.cmd.GrpcCmd");
+            Class<?> grpcCmdClass = Class.forName("io.ballerina.protoc.cli.GrpcCmd");
             GrpcCmd grpcCmd = (GrpcCmd) grpcCmdClass.getDeclaredConstructor().newInstance();
             grpcCmd.setProtoPath(RESOURCE_DIRECTORY + FILE_SEPARATOR + PROTO_FILE_DIRECTORY + subDir);
             grpcCmd.setBalOutPath(protocOutputDirPath.toAbsolutePath().toString());
@@ -205,7 +205,7 @@ public class ToolingTestUtils {
     public static void generateSourceCode(Path sProtoFilePath, Path sOutputDirPath, String mode, Path sImportDirPath) {
         Class<?> grpcCmdClass;
         try {
-            grpcCmdClass = Class.forName("io.ballerina.protoc.protobuf.cmd.GrpcCmd");
+            grpcCmdClass = Class.forName("io.ballerina.protoc.cli.GrpcCmd");
             GrpcCmd grpcCmd = (GrpcCmd) grpcCmdClass.getDeclaredConstructor().newInstance();
             grpcCmd.setProtoPath(sProtoFilePath.toAbsolutePath().toString());
             if (!sOutputDirPath.toString().isBlank()) {
