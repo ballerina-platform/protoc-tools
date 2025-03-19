@@ -27,3 +27,5 @@ gradleEnterprise {
         termsOfServiceAgree = 'yes'
     }
 }
+include 'protoc-core'
+

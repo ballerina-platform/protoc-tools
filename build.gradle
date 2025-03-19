@@ -184,5 +184,6 @@ publishing {
 }
 
 directoryBuild.dependsOn ":${packageName}-cli:build"
+directoryBuild.dependsOn ":${packageName}-core:build"
 build.dependsOn directoryBuild
 

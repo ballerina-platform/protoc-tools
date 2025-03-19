@@ -1,2 +1,2 @@
-io.ballerina.protoc.protobuf.cmd.GrpcCmd
+io.ballerina.protoc.cli.GrpcCmd
 
