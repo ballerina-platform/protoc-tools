@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 WSO2 LLC. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2025 WSO2 LLC. (http://www.wso2.org).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -28,7 +28,6 @@ module io.ballerina.protoc.core {
     requires io.ballerina.tools.api;
     requires io.ballerina.parser;
     requires io.ballerina.formatter.core;
-//    requires io.ballerina.cli;
     requires io.ballerina.toml;
     requires info.picocli;
     requires org.slf4j;
