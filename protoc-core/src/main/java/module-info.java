@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 WSO2 LLC. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2025 WSO2 LLC. (http://www.wso2.org).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -16,10 +16,21 @@
  * under the License.
  */
 
-module io.ballerina.protoc {
-    requires io.ballerina.cli;
+module io.ballerina.protoc.core {
+    exports io.ballerina.protoc.core.exception;
+    exports io.ballerina.protoc.core.descriptor;
+    exports io.ballerina.protoc.core;
+    exports io.ballerina.protoc.core.builder;
+    exports io.ballerina.protoc.core.builder.balgen;
+    requires proto.google.common.protos;
+    requires io.ballerina.runtime;
+    requires io.ballerina.lang;
+    requires io.ballerina.tools.api;
+    requires io.ballerina.parser;
+    requires io.ballerina.formatter.core;
+    requires io.ballerina.toml;
     requires info.picocli;
-    requires io.ballerina.protoc.core;
     requires org.slf4j;
+    requires org.apache.commons.lang3;
     requires protobuf.java;
 }
