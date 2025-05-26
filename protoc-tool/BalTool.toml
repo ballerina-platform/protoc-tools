@@ -2,7 +2,7 @@
 id = "grpc"
 
 [[dependency]]
-path = "../protoc-cli/build/libs/protoc-cli-@project.version@.jar"
+path = "../protoc-cli/build/libs/protoc-cli-0.6.0-SNAPSHOT.jar"
 
 [[dependency]]
-path = "../protoc-core/build/libs/protoc-core-@project.version@.jar"
+path = "../protoc-core/build/libs/protoc-core-0.6.0-SNAPSHOT.jar"

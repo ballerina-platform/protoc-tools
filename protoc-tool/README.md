@@ -29,3 +29,5 @@ message HelloResponse {
 
 gRPC allows client applications to directly call the server-side methods using the auto-generated stubs. Protocol
 Buffer compiler is used to generate the stubs for the specified language. In Ballerina, the stubs are generated using the built-in 'Protocol Buffers to Ballerina' tool.
+
+For information on how to generate Ballerina code for Protocol Buffers definition, see [Write a gRPC service with Ballerina](https://ballerina.io/learn/write-a-grpc-service-with-ballerina/).

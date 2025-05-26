@@ -26,14 +26,7 @@ description = 'Ballerina - protoc-tools Tooling Test'
 
 def buildDir = "build";
 def ballerinaDist = "$project.buildDir/jballerina-tools-${ballerinaLangVersion}"
-
-configurations {
-    balTools
-    ballerinaStdLibs
-    dist {
-        transitive true
-    }
-}
+def packageName = "protoc"
 
 dependencies {
     checkstyle project(':checkstyle')
@@ -51,7 +44,7 @@ dependencies {
     testImplementation project(":protoc-cli")
     testImplementation group: 'org.testng', name: 'testng', version: "${testngVersion}"
 
-    balTools ("org.ballerinalang:jballerina-tools:${ballerinaLangVersion}") {
+    jbalTools ("org.ballerinalang:jballerina-tools:${ballerinaLangVersion}") {
         transitive = false
     }
     ballerinaStdLibs "io.ballerina.stdlib:grpc-ballerina:${stdlibGrpcVersion}"
@@ -80,7 +73,7 @@ dependencies {
 
 task jBallerinaPack {
     doLast {
-        configurations.balTools.resolvedConfiguration.resolvedArtifacts.each { artifact ->
+        configurations.jbalTools.resolvedConfiguration.resolvedArtifacts.each { artifact ->
             copy {
                 from project.zipTree(artifact.getFile())
                 into new File("${project.buildDir}")
@@ -153,10 +146,6 @@ spotbugsMain {
     enabled false
 }
 
-checkstyleMain {
-    enabled false
-}
-
 test {
     dependsOn(copyStdlibs)
     systemProperty "ballerina.home", ballerinaDist
@@ -186,7 +175,11 @@ jacoco {
 jacocoTestReport {
     dependsOn test
     dependsOn ":protoc-cli:compileJava"
-    def classFiles = new File("${rootDir}/protoc-cli/build/classes/java/main/io/ballerina/protoc")
+    dependsOn ":protoc-core:compileJava"
+    def classFiles = files(
+        fileTree(dir: "${rootDir}/${packageName}-cli/build/classes/java/main/io/ballerina/protoc/cli"),
+        fileTree(dir: "${rootDir}/${packageName}-core/build/classes/java/main/io/ballerina/protoc/core")
+    )
     additionalClassDirs(classFiles)
     reports {
         xml.required = true
@@ -203,3 +196,4 @@ compileJava {
 }
 
 test.dependsOn ":protoc-cli:build"
+build.dependsOn test
