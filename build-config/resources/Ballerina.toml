@@ -1,0 +1,8 @@
+[package]
+org = "ballerina"
+name = "tool_protoc"
+version = "@toml.version@"
+authors = ["Ballerina"]
+keywords = ["grpc", "protoc tool"]
+license = ["Apache-2.0"]
+distribution = "2201.12.3"

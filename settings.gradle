@@ -7,6 +7,27 @@
  * in the user manual at https://docs.gradle.org/6.3/userguide/multi_project_builds.html
  */
 
+pluginManagement {
+    plugins {
+        id "com.github.spotbugs" version "${githubSpotbugsVersion}"
+        id "com.github.johnrengelman.shadow" version "${githubJohnrengelmanShadowVersion}"
+        id "de.undercouch.download" version "${underCouchDownloadVersion}"
+        id "net.researchgate.release" version "${researchgateReleaseVersion}"
+        id "io.ballerina.plugin" version "${ballerinaGradlePluginVersion}"
+    }
+
+    repositories {
+        gradlePluginPortal()
+        maven {
+            url = 'https://maven.pkg.github.com/ballerina-platform/*'
+            credentials {
+                username System.getenv("packageUser")
+                password System.getenv("packagePAT")
+            }
+        }
+    }
+}
+
 plugins {
     id "com.gradle.enterprise" version "3.13.2"
 }
@@ -15,11 +36,11 @@ rootProject.name = 'protoc-tools'
 
 include ':checkstyle'
 include ':protoc-cli'
+include 'protoc-core'
 include ':tooling-tests'
+include ':protoc-tool'
 
 project(':checkstyle').projectDir = file("build-config${File.separator}checkstyle")
-project(':protoc-cli').projectDir = file('protoc-cli')
-project(':tooling-tests').projectDir = file('tooling-tests')
 
 gradleEnterprise {
     buildScan {
@@ -27,5 +48,3 @@ gradleEnterprise {
         termsOfServiceAgree = 'yes'
     }
 }
-include 'protoc-core'
-

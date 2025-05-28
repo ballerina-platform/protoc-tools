@@ -17,12 +17,11 @@
  */
 
 plugins {
-    id 'java-library'
     id 'jacoco'
-    id "com.github.spotbugs" version "${githubSpotbugsVersion}"
-    id "com.github.johnrengelman.shadow" version "${githubJohnrengelmanShadowVersion}"
-    id "de.undercouch.download" version "${underCouchDownloadVersion}"
-    id "net.researchgate.release" version "${researchgateReleaseVersion}"
+    id "com.github.spotbugs"
+    id "com.github.johnrengelman.shadow"
+    id "de.undercouch.download"
+    id "net.researchgate.release"
 }
 
 def packageName = "protoc"
@@ -69,10 +68,40 @@ allprojects {
 }
 
 subprojects {
-    apply plugin: 'java-library'
     configurations {
         externalJars
         ballerinaStdLibs
+        jbalTools
+    }
+
+    dependencies {
+        /* JBallerina Tools */
+        jbalTools("org.ballerinalang:jballerina-tools:${ballerinaLangVersion}") {
+            transitive = false
+        }
+
+        /* Standard libraries */
+        ballerinaStdLibs "io.ballerina.stdlib:io-ballerina:${stdlibIoVersion}"
+        ballerinaStdLibs "io.ballerina.stdlib:time-ballerina:${stdlibTimeVersion}"
+        ballerinaStdLibs "io.ballerina.stdlib:url-ballerina:${stdlibUrlVersion}"
+        ballerinaStdLibs "io.ballerina.stdlib:constraint-ballerina:${stdlibConstraintVersion}"
+        ballerinaStdLibs "io.ballerina.stdlib:crypto-ballerina:${stdlibCryptoVersion}"
+        ballerinaStdLibs "io.ballerina.stdlib:log-ballerina:${stdlibLogVersion}"
+        ballerinaStdLibs "io.ballerina.stdlib:os-ballerina:${stdlibOsVersion}"
+        ballerinaStdLibs "io.ballerina.stdlib:protobuf-ballerina:${stdlibProtobufVersion}"
+        ballerinaStdLibs "io.ballerina.stdlib:random-ballerina:${stdlibRandomVersion}"
+        ballerinaStdLibs "io.ballerina.stdlib:task-ballerina:${stdlibTaskVersion}"
+        ballerinaStdLibs "io.ballerina.stdlib:cache-ballerina:${stdlibCacheVersion}"
+        ballerinaStdLibs "io.ballerina.stdlib:file-ballerina:${stdlibFileVersion}"
+        ballerinaStdLibs "io.ballerina.stdlib:mime-ballerina:${stdlibMimeVersion}"
+        ballerinaStdLibs "io.ballerina.stdlib:uuid-ballerina:${stdlibUuidVersion}"
+        ballerinaStdLibs "io.ballerina.stdlib:auth-ballerina:${stdlibAuthVersion}"
+        ballerinaStdLibs "io.ballerina.stdlib:jwt-ballerina:${stdlibJwtVersion}"
+        ballerinaStdLibs "io.ballerina.stdlib:oauth2-ballerina:${stdlibOAuth2Version}"
+        ballerinaStdLibs "io.ballerina.stdlib:http-ballerina:${stdlibHttpVersion}"
+        ballerinaStdLibs "io.ballerina.stdlib:grpc-ballerina:${stdlibGrpcVersion}"
+        ballerinaStdLibs "io.ballerina.stdlib:observe-ballerina:${observeVersion}"
+        ballerinaStdLibs "io.ballerina:observe-ballerina:${observeInternalVersion}"
     }
 }
 
@@ -93,20 +122,31 @@ tasks.withType(JavaCompile) {
 }
 
 task codeCoverageReport(type: JacocoReport) {
-    dependsOn = subprojects.test
+    dependsOn(":${packageName}-tool:build")
+    dependsOn(":tooling-tests:jacocoTestReport")
+    dependsOn(":checkstyle:test")
 
-    executionData fileTree(project.rootDir.absolutePath).include("**/build/coverage-reports/*.exec")
+    executionData fileTree(project.rootDir.absolutePath).include("**/build/jacoco/*.exec")
 
-    subprojects.each {
-        sourceSets it.sourceSets.main
-    }
+    def sourceDirs = files(
+        "${project.rootDir}/${packageName}-cli/src/main/java",
+        "${project.rootDir}/${packageName}-core/src/main/java"
+    )
+
+    def classDirs = files(
+        fileTree(dir: "${rootDir}/${packageName}-cli/build/classes/java/main/io/ballerina/protoc/cli"),
+        fileTree(dir: "${rootDir}/${packageName}-core/build/classes/java/main/io/ballerina/protoc/core")
+    )
+
+    sourceDirectories.setFrom(sourceDirs)
+    classDirectories.setFrom(classDirs)
     reports {
         xml.required = true
         html.required = true
         csv.required = true
-        xml.destination(new File("${buildDir}/reports/jacoco/report.xml"))
-        html.destination(new File("${buildDir}/reports/jacoco/report.html"))
-        csv.destination(new File("${buildDir}/reports/jacoco/report.csv"))
+        xml.destination(new File("${buildDir}/reports/jacoco/test/jacocoTestReport.xml"))
+        html.destination(new File("${buildDir}/reports/jacoco/test/jacocoTestReport.html"))
+        csv.destination(new File("${buildDir}/reports/jacoco/test/jacocoTestReport.csv"))
     }
 
     onlyIf = {
@@ -114,76 +154,6 @@ task codeCoverageReport(type: JacocoReport) {
     }
 }
 
-def artifactCacheParent = file("$project.projectDir/build/cache_parent/")
-def artifactLibParent = file("$project.projectDir/build/lib_parent/")
-def targetProtocCliJar = file("$project.rootDir/protoc-cli/build/libs/protoc-cli-${project.version}.jar")
-
-jar {
-    manifest {
-        attributes('Implementation-Title': project.name,
-                'Implementation-Version': project.version)
-    }
+task build {
+    dependsOn(":${packageName}-tool:build")
 }
-
-task directoryBuild {
-    dependsOn(compileJava)
-    dependsOn(compileTestJava)
-    dependsOn(":test")
-    dependsOn(":jar")
-    dependsOn(":processResources")
-    dependsOn(":spotbugsMain")
-    dependsOn(":spotbugsTest")
-    dependsOn("compileTestJava")
-    dependsOn("checkstyle:test")
-    dependsOn("checkstyle:processTestResources")
-    dependsOn(":tooling-tests:compileJava")
-    dependsOn(":tooling-tests:compileTestJava")
-    dependsOn(":tooling-tests:jar")
-    dependsOn(":tooling-tests:checkstyleTest")
-    dependsOn(":tooling-tests:spotbugsTest")
-    dependsOn(":tooling-tests:test")
-    dependsOn(":tooling-tests:copyStdlibs")
-    dependsOn(":tooling-tests:jBallerinaPack")
-    dependsOn(":tooling-tests:jacocoTestReport")
-    dependsOn(":generatePomFileForMavenJavaPublication")
-    inputs.dir file(project.projectDir)
-    doLast {
-        copy {
-            from targetProtocCliJar
-            into file("$artifactLibParent/libs")
-        }
-    }
-
-    outputs.dir artifactCacheParent
-    outputs.dir artifactLibParent
-    doNotTrackState("build needs to run every time")
-}
-
-task createArtifactZip(type: Zip) {
-    destinationDirectory = file("${buildDir}/distributions")
-    from directoryBuild
-}
-
-publishing {
-    publications {
-        mavenJava(MavenPublication) {
-            artifact source: createArtifactZip, extension: 'zip'
-        }
-    }
-
-    repositories {
-        maven {
-            name = "GitHubPackages"
-            url = uri("https://maven.pkg.github.com/ballerina-platform/protoc-tools")
-            credentials {
-                username = System.getenv("publishUser")
-                password = System.getenv("publishPAT")
-            }
-        }
-    }
-}
-
-directoryBuild.dependsOn ":${packageName}-cli:build"
-directoryBuild.dependsOn ":${packageName}-core:build"
-build.dependsOn directoryBuild
-
