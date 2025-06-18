@@ -22,8 +22,8 @@ import com.google.protobuf.DescriptorProtos;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 
 import static io.ballerina.protoc.core.GrpcConstants.REGEX_DOT_SEPERATOR;
 import static io.ballerina.protoc.core.builder.balgen.BalGenerationUtils.getMappingBalType;
@@ -125,14 +125,12 @@ public class Message {
                 if (nestedDescriptorProto.hasOptions() && nestedDescriptorProto.getOptions().hasMapEntry()) {
                     mapNames.add(messageName + "_" + nestedDescriptorProto.getName());
 
-                    // remove unnecessary "Entry" part appends to the message name by the proto library
-                    if (nestedMessage.getMessageName().length() > 5) {
-                        nestedMessage.setMessageName(
-                                nestedMessage.getMessageName().substring(
-                                        0, nestedMessage.getMessageName().length() - 5
-                                ).toLowerCase(Locale.getDefault())
-                        );
-                    }
+                    Optional<DescriptorProtos.FieldDescriptorProto> mapFieldDescriptor =
+                            messageDescriptor.getFieldList().stream()
+                                    .filter(field -> field.getTypeName().endsWith(nestedMessage.getMessageName()))
+                                    .findFirst();
+                    mapFieldDescriptor.ifPresent(fieldDescriptorProto ->
+                            nestedMessage.setMessageName(fieldDescriptorProto.getName()));
                     mapList.add(nestedMessage);
                 } else {
                     nestedMessageList.add(nestedMessage);
