@@ -4,6 +4,15 @@ This file contains all the notable changes done to the Ballerina protoc-tools pa
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased
+
+### Fixed
+- [Fix the issue when there is Map type in the proto definition](ballerina-platform/ballerina-library#8034)
+
+### Added
+- [Expose proto tool Java APIs to generate gRPC service from proto file](https://github.com/ballerina-platform/ballerina-library/issues/7554)
+- [Decouple Protoc tool from the Distribution](https://github.com/ballerina-platform/ballerina-library/issues/7939)
+
 ## [0.3.1] - 2024-10-07
 
 ### Fixed
