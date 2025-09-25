@@ -35,6 +35,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.Objects;
 
 import static io.ballerina.protoc.core.builder.balgen.BalGenConstants.FILE_SEPARATOR;
 
@@ -119,7 +120,7 @@ public class ToolingTestUtils {
             Assert.fail("Failed to delete stub file", e);
         }
         if (subModulesFiles.length > 0) {
-            for (String subModuleFile: subModulesFiles.clone()) {
+            for (String subModuleFile : subModulesFiles.clone()) {
                 expectedStubFilePath = Paths.get(RESOURCE_DIRECTORY.toString(), BAL_FILE_DIRECTORY,
                         outputDir, subModuleFile);
                 actualStubFilePath = outputDirPath.resolve(subModuleFile);
@@ -184,7 +185,7 @@ public class ToolingTestUtils {
             }
             grpcCmd.execute();
         } catch (ClassNotFoundException | IllegalAccessException | InstantiationException |
-                NoSuchMethodException | InvocationTargetException e) {
+                 NoSuchMethodException | InvocationTargetException e) {
             throw new RuntimeException(e);
         }
         Path destTomlFile = outputDirPath.resolve(BALLERINA_TOML_FILE);
@@ -219,7 +220,7 @@ public class ToolingTestUtils {
             }
             grpcCmd.execute();
         } catch (ClassNotFoundException | IllegalAccessException | InstantiationException |
-                NoSuchMethodException | InvocationTargetException e) {
+                 NoSuchMethodException | InvocationTargetException e) {
             throw new RuntimeException(e);
         }
     }
@@ -265,5 +266,18 @@ public class ToolingTestUtils {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    static String getHelpText() throws IOException {
+        Path currentDir = Paths.get("").toAbsolutePath();
+        Path projectRoot = currentDir.getParent();
+        if (projectRoot == null) {
+            // If we're already at root, use current directory
+            projectRoot = currentDir;
+        }
+        projectRoot = Objects.requireNonNull(projectRoot);
+        Path helpFileRelativePath = Path.of("protoc-cli", "src", "main", "resources", "ballerina-grpc.help");
+        Path helpFilePath = projectRoot.resolve(helpFileRelativePath);
+        return Files.readString(helpFilePath, java.nio.charset.StandardCharsets.UTF_8).trim();
     }
 }
