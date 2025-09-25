@@ -37,6 +37,7 @@ import static io.ballerina.protoc.tools.ToolingTestUtils.assertGeneratedSources;
 import static io.ballerina.protoc.tools.ToolingTestUtils.assertGeneratedSourcesWithNestedDirectories;
 import static io.ballerina.protoc.tools.ToolingTestUtils.copyBallerinaToml;
 import static io.ballerina.protoc.tools.ToolingTestUtils.generateSourceCode;
+import static io.ballerina.protoc.tools.ToolingTestUtils.getHelpText;
 import static io.ballerina.protoc.tools.ToolingTestUtils.hasSemanticDiagnostics;
 import static io.ballerina.protoc.tools.ToolingTestUtils.hasSyntacticDiagnostics;
 import static io.ballerina.protoc.tools.ToolingTestUtils.readContent;
@@ -51,6 +52,54 @@ public class ToolingCommonTest {
         assertGeneratedDataTypeSources("data-types", "helloWorldWithDependency.proto",
                 "helloWorldWithDependency_pb.bal", "tool_test_data_type_1");
     }
+
+    @Test
+    public void testCommandWithoutArguments() {
+        // Capture output using ByteArrayOutputStream with explicit encoding
+        java.io.ByteArrayOutputStream outputStream = new java.io.ByteArrayOutputStream();
+        java.io.PrintStream printStream = new java.io.PrintStream(outputStream, true,
+                java.nio.charset.StandardCharsets.UTF_8);
+
+        // Create a GrpcCmd instance with the captured print stream
+        io.ballerina.protoc.cli.GrpcCmd grpcCmd = new io.ballerina.protoc.cli.GrpcCmd(printStream);
+
+        try {
+            grpcCmd.execute();
+            String actualOutput = outputStream.toString(java.nio.charset.StandardCharsets.UTF_8).trim();
+            String expectedOutput = getHelpText();
+            Assert.assertEquals(actualOutput, expectedOutput,
+                    "Expected help text to be displayed when no arguments are provided");
+        } catch (Exception e) {
+            Assert.fail("Command should not throw exception when no arguments are provided, but should show help " +
+                    "instead. Exception: " + e.getMessage());
+        }
+    }
+
+    @Test
+    public void testCommandWithHelpFlag() {
+        java.io.ByteArrayOutputStream outputStream = new java.io.ByteArrayOutputStream();
+        java.io.PrintStream printStream = new java.io.PrintStream(outputStream, true,
+                java.nio.charset.StandardCharsets.UTF_8);
+        io.ballerina.protoc.cli.GrpcCmd grpcCmd = new io.ballerina.protoc.cli.GrpcCmd(printStream);
+
+        try {
+            java.lang.reflect.Field helpFlagField = grpcCmd.getClass().getDeclaredField("helpFlag");
+            helpFlagField.setAccessible(true);
+            helpFlagField.set(grpcCmd, true);
+
+            grpcCmd.execute();
+
+            String actualOutput = outputStream.toString(java.nio.charset.StandardCharsets.UTF_8).trim();
+            String expectedOutput = getHelpText();
+            Assert.assertEquals(actualOutput, expectedOutput,
+                    "Expected help text to be displayed when --help flag is provided");
+        } catch (ReflectiveOperationException e) {
+            Assert.fail("Help flag test failed due to reflection error: " + e.getMessage());
+        } catch (Exception e) {
+            Assert.fail("Help flag test failed with unexpected exception: " + e.getMessage());
+        }
+    }
+
     @Test
     public void testHelloWorldWithEnum() {
         assertGeneratedDataTypeSources("data-types", "helloWorldWithEnum.proto",
@@ -122,37 +171,37 @@ public class ToolingCommonTest {
     @Test
     public void testHelloWorldWithDuplicateInputOutput() {
         assertGeneratedDataTypeSources("data-types", "helloWorldWithDuplicateInputOutput.proto",
-        "helloWorldWithDuplicateInputOutput_pb.bal", "tool_test_data_type_13");
+                "helloWorldWithDuplicateInputOutput_pb.bal", "tool_test_data_type_13");
     }
 
     @Test
     public void testHelloWorldWithDurationType1() {
         assertGeneratedSources("data-types", "duration_type1.proto", "duration_type1_pb.bal",
-        "durationhandler_service.bal", "durationhandler_client.bal", "tool_test_data_type_15");
+                "durationhandler_service.bal", "durationhandler_client.bal", "tool_test_data_type_15");
     }
 
     @Test
     public void testHelloWorldWithDurationType2() {
         assertGeneratedSources("data-types", "duration_type2.proto", "duration_type2_pb.bal",
-        "durationhandler_service.bal", "durationhandler_client.bal", "tool_test_data_type_16");
+                "durationhandler_service.bal", "durationhandler_client.bal", "tool_test_data_type_16");
     }
 
     @Test
     public void testHelloWorldWithStructType1() {
         assertGeneratedSources("data-types", "struct_type1.proto", "struct_type1_pb.bal",
-        "structhandler_service.bal", "structhandler_client.bal", "tool_test_data_type_17");
+                "structhandler_service.bal", "structhandler_client.bal", "tool_test_data_type_17");
     }
 
     @Test
     public void testHelloWorldWithStructType2() {
         assertGeneratedSources("data-types", "struct_type2.proto", "struct_type2_pb.bal",
-        "structhandler_service.bal", "structhandler_client.bal", "tool_test_data_type_18");
+                "structhandler_service.bal", "structhandler_client.bal", "tool_test_data_type_18");
     }
 
     @Test
     public void testHelloWorldWithAnyType() {
         assertGeneratedSources("data-types", "any.proto", "any_pb.bal", "anytypeserver_service.bal",
-        "anytypeserver_client.bal", "tool_test_data_type_21");
+                "anytypeserver_client.bal", "tool_test_data_type_21");
     }
 
     @Test
@@ -166,9 +215,9 @@ public class ToolingCommonTest {
     @Test
     public void testTimeWithDependency() {
         assertGeneratedDataTypeSources("data-types", "time_root.proto", "time_root_pb.bal",
-        "tool_test_data_type_19");
+                "tool_test_data_type_19");
         assertGeneratedDataTypeSources("data-types", "time_root.proto", "time_dependent_pb.bal",
-        "tool_test_data_type_19");
+                "tool_test_data_type_19");
     }
 
     @Test
@@ -350,15 +399,15 @@ public class ToolingCommonTest {
 
     @Test
     public void testGeneratedFileNewlines() {
+        Path outputDirPath = Paths.get(GENERATED_SOURCES_DIRECTORY, "tool_test_newline_test");
         try {
-            Files.createDirectories(Paths.get(GENERATED_SOURCES_DIRECTORY, "tool_test_newline_test"));
+            Files.createDirectories(outputDirPath);
         } catch (IOException e) {
             Assert.fail("Could not create target directories", e);
         }
 
-        Path protoFilePath = Paths.get(RESOURCE_DIRECTORY.toString(), PROTO_FILE_DIRECTORY, "data-types", 
+        Path protoFilePath = Paths.get(RESOURCE_DIRECTORY.toString(), PROTO_FILE_DIRECTORY, "data-types",
                 "message.proto");
-        Path outputDirPath = Paths.get(GENERATED_SOURCES_DIRECTORY, "tool_test_newline_test");
         Path generatedFile = outputDirPath.resolve("message_pb.bal");
 
         generateSourceCode(protoFilePath, outputDirPath, null, null);
@@ -368,16 +417,16 @@ public class ToolingCommonTest {
             String content = Files.readString(generatedFile);
             int newlineCount = 0;
             int index = content.length() - 1;
-                
+
             // check for newlines at the end of the file
             while (index >= 0 && content.charAt(index) == '\n') {
                 newlineCount++;
                 index--;
             }
-                
+
             // if the newline count is not 1, fail the test
-            Assert.assertEquals(newlineCount, 1, 
-                "Generated file should have exactly one newline at the end, found " + newlineCount);
+            Assert.assertEquals(newlineCount, 1,
+                    "Generated file should have exactly one newline at the end, found " + newlineCount);
         } catch (IOException e) {
             Assert.fail("Failed to read generated file", e);
         }

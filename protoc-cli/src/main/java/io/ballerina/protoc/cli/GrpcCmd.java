@@ -71,16 +71,24 @@ public class GrpcCmd implements BLauncherCmd {
 
     private static final Logger LOG = LoggerFactory.getLogger(GrpcCmd.class);
 
-    private static final PrintStream outStream = System.out;
+    private PrintStream outStream;
     private static final String PROTO_EXTENSION = "proto";
 
     private CommandLine parentCmdParser;
+
+    public GrpcCmd() {
+        this.outStream = System.out;
+    }
+
+    public GrpcCmd(PrintStream outStream) {
+        this.outStream = outStream;
+    }
 
     @CommandLine.Option(names = {"-h", "--help"}, hidden = true, usageHelp = true)
     private boolean helpFlag;
 
     @CommandLine.Option(names = {"--input"}, description = "Input .proto file or a directory containing " +
-            "multiple .proto files", required = true)
+            "multiple .proto files")
     private String protoPath;
 
     @CommandLine.Option(names = {"--mode"},
@@ -126,10 +134,9 @@ public class GrpcCmd implements BLauncherCmd {
     
     @Override
     public void execute() {
-        //Help flag check
-        if (helpFlag) {
-            String commandUsageInfo = BLauncherCmd.getCommandUsageInfo(getName());
-            outStream.println(commandUsageInfo);
+        // Show help text
+        if (helpFlag || protoPath == null || protoPath.trim().isEmpty()) {
+            printLongDesc(new StringBuilder());
             return;
         }
 
@@ -425,9 +432,20 @@ public class GrpcCmd implements BLauncherCmd {
     
     @Override
     public void printLongDesc(StringBuilder out) {
-        out.append("Generates ballerina gRPC client stub for gRPC service").append(System.lineSeparator());
-        out.append("for a given grpc protoc definition").append(System.lineSeparator());
-        out.append(System.lineSeparator());
+        Class<GrpcCmd> cmdClass = GrpcCmd.class;
+        ClassLoader classLoader = cmdClass.getClassLoader();
+        InputStream inputStream = classLoader.getResourceAsStream("ballerina-grpc.help");
+        try (InputStreamReader inputStreamReader = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
+             BufferedReader br = new BufferedReader(inputStreamReader)) {
+            String content = br.readLine();
+            outStream.append(content);
+            while ((content = br.readLine()) != null) {
+                outStream.append('\n').append(content);
+            }
+            outStream.append('\n');
+        } catch (IOException ex) {
+            throw new IllegalStateException(ex);
+        }
     }
     
     @Override
