@@ -150,8 +150,11 @@ test {
     dependsOn(copyStdlibs)
     systemProperty "ballerina.home", ballerinaDist
     systemProperty "ballerina.offline.flag", "true"
+    binaryResultsDirectory = file("$buildDir/test-results/binary")
     useTestNG() {
         suites 'src/test/resources/testng.xml'
+        outputDirectory = file("$buildDir/test-output")
+        useDefaultListeners = true
     }
     testLogging.showStandardStreams = true
     testLogging {
@@ -166,6 +169,10 @@ test {
         }
     }
     finalizedBy jacocoTestReport
+}
+
+clean {
+    delete file("$buildDir/generated-sources")
 }
 
 jacoco {

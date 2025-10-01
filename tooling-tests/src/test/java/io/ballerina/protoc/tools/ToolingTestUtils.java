@@ -29,8 +29,9 @@ import io.ballerina.tools.text.TextDocument;
 import io.ballerina.tools.text.TextDocuments;
 import org.testng.Assert;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
+import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -167,27 +168,21 @@ public class ToolingTestUtils {
     }
 
     public static void assertGeneratedSourcesWithNestedDirectories(String subDir, String outputDir, String importDir) {
-        Path outputDirPath = Paths.get(GENERATED_SOURCES_DIRECTORY, outputDir);
+        Path outputDirPath = Paths.get(GENERATED_SOURCES_DIRECTORY, outputDir);;
         Path protocOutputDirPath;
         if (outputDir.contains("tool_test_packaging")) {
             protocOutputDirPath = Paths.get(GENERATED_SOURCES_DIRECTORY);
         } else {
-            protocOutputDirPath = Paths.get(GENERATED_SOURCES_DIRECTORY, outputDir);
+            protocOutputDirPath = outputDirPath;
         }
-        try {
-            Class<?> grpcCmdClass = Class.forName("io.ballerina.protoc.cli.GrpcCmd");
-            GrpcCmd grpcCmd = (GrpcCmd) grpcCmdClass.getDeclaredConstructor().newInstance();
-            grpcCmd.setProtoPath(RESOURCE_DIRECTORY + FILE_SEPARATOR + PROTO_FILE_DIRECTORY + subDir);
-            grpcCmd.setBalOutPath(protocOutputDirPath.toAbsolutePath().toString());
-            if (importDir != null) {
-                grpcCmd.setImportPath(Paths.get(RESOURCE_DIRECTORY.toString(), PROTO_FILE_DIRECTORY, importDir)
-                        .toAbsolutePath().toString());
-            }
-            grpcCmd.execute();
-        } catch (ClassNotFoundException | IllegalAccessException | InstantiationException |
-                 NoSuchMethodException | InvocationTargetException e) {
-            throw new RuntimeException(e);
+        GrpcCmd grpcCmd = createGrpcCmd();
+        grpcCmd.setProtoPath(RESOURCE_DIRECTORY + FILE_SEPARATOR + PROTO_FILE_DIRECTORY + subDir);
+        grpcCmd.setBalOutPath(protocOutputDirPath.toAbsolutePath().toString());
+        if (importDir != null) {
+            grpcCmd.setImportPath(Paths.get(RESOURCE_DIRECTORY.toString(), PROTO_FILE_DIRECTORY, importDir)
+                    .toAbsolutePath().toString());
         }
+        grpcCmd.execute();
         Path destTomlFile = outputDirPath.resolve(BALLERINA_TOML_FILE);
         copyBallerinaToml(destTomlFile);
         Assert.assertFalse(hasSemanticDiagnostics(outputDirPath, false));
@@ -204,25 +199,46 @@ public class ToolingTestUtils {
     }
 
     public static void generateSourceCode(Path sProtoFilePath, Path sOutputDirPath, String mode, Path sImportDirPath) {
-        Class<?> grpcCmdClass;
-        try {
-            grpcCmdClass = Class.forName("io.ballerina.protoc.cli.GrpcCmd");
-            GrpcCmd grpcCmd = (GrpcCmd) grpcCmdClass.getDeclaredConstructor().newInstance();
-            grpcCmd.setProtoPath(sProtoFilePath.toAbsolutePath().toString());
-            if (!sOutputDirPath.toString().isBlank()) {
-                grpcCmd.setBalOutPath(sOutputDirPath.toAbsolutePath().toString());
-            }
-            if (mode != null) {
-                grpcCmd.setMode(mode);
-            }
-            if (sImportDirPath != null) {
-                grpcCmd.setImportPath(sImportDirPath.toAbsolutePath().toString());
-            }
-            grpcCmd.execute();
-        } catch (ClassNotFoundException | IllegalAccessException | InstantiationException |
-                 NoSuchMethodException | InvocationTargetException e) {
-            throw new RuntimeException(e);
+        GrpcCmd grpcCmd = createGrpcCmd();
+        grpcCmd.setProtoPath(sProtoFilePath.toAbsolutePath().toString());
+        if (!sOutputDirPath.toString().isBlank()) {
+            grpcCmd.setBalOutPath(sOutputDirPath.toAbsolutePath().toString());
         }
+        if (mode != null) {
+            grpcCmd.setMode(mode);
+        }
+        if (sImportDirPath != null) {
+            grpcCmd.setImportPath(sImportDirPath.toAbsolutePath().toString());
+        }
+        grpcCmd.execute();
+    }
+
+    /**
+     * Creates a GrpcCmd instance with a no-op exit handler to prevent System.exit() from killing the test process.
+     *
+     * @param outputStream the output stream to capture command output
+     * @return a GrpcCmd instance configured for testing
+     */
+    public static GrpcCmd createGrpcCmd(ByteArrayOutputStream outputStream) {
+        PrintStream printStream = new PrintStream(outputStream, true, java.nio.charset.StandardCharsets.UTF_8);
+        // Use a no-op exit handler to prevent System.exit() from killing the test process
+        GrpcCmd.ExitHandler noOpExitHandler = code -> {
+            // Do nothing - just capture the exit intent without actually exiting
+        };
+        return new GrpcCmd(printStream, noOpExitHandler);
+    }
+
+    /**
+     * Creates a GrpcCmd instance with a no-op exit handler using System.out.
+     *
+     * @return a GrpcCmd instance configured for testing
+     */
+    public static GrpcCmd createGrpcCmd() {
+        // Use a no-op exit handler to prevent System.exit() from killing the test process
+        GrpcCmd.ExitHandler noOpExitHandler = code -> {
+            // Do nothing - just capture the exit intent without actually exiting
+        };
+        return new GrpcCmd(System.out, noOpExitHandler);
     }
 
     public static boolean hasSemanticDiagnostics(Path projectPath, boolean isSingleFile) {

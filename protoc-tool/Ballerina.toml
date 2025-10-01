@@ -1,8 +1,8 @@
 [package]
 org = "ballerina"
-name = "tool_protoc"
+name = "tool.grpc"
 version = "1.0.0"
 authors = ["Ballerina"]
 keywords = ["grpc", "protoc tool"]
 license = ["Apache-2.0"]
-distribution = "2201.12.3"
+distribution = "2201.13.0"

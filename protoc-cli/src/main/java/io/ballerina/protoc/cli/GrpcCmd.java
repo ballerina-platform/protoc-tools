@@ -70,18 +70,47 @@ import static io.ballerina.protoc.core.BalGenerationConstants.TMP_DIRECTORY_PATH
 public class GrpcCmd implements BLauncherCmd {
 
     private static final Logger LOG = LoggerFactory.getLogger(GrpcCmd.class);
+    private static final int EXIT_CODE_0 = 0;
+    private static final int EXIT_CODE_2 = 2;
+    private static final ExitHandler DEFAULT_EXIT_HANDLER = code -> Runtime.getRuntime().exit(code);
 
     private PrintStream outStream;
     private static final String PROTO_EXTENSION = "proto";
 
     private CommandLine parentCmdParser;
+    private final ExitHandler exitHandler;
+
+    /**
+     * Functional interface for handling exit behavior.
+     * Public to allow test access from other packages.
+     */
+    @FunctionalInterface
+    public interface ExitHandler {
+        void exit(int code);
+    }
 
     public GrpcCmd() {
-        this.outStream = System.out;
+        this(System.out, DEFAULT_EXIT_HANDLER);
     }
 
     public GrpcCmd(PrintStream outStream) {
+        this(outStream, DEFAULT_EXIT_HANDLER);
+    }
+
+    /**
+     * Constructor for testing with custom exit handler.
+     * This is public to allow tests in other packages to use it.
+     *
+     * @param outStream   output stream
+     * @param exitHandler custom exit handler (for testing)
+     */
+    public GrpcCmd(PrintStream outStream, ExitHandler exitHandler) {
         this.outStream = outStream;
+        this.exitHandler = exitHandler;
+    }
+
+    private void exit(int code) {
+        exitHandler.exit(code);
     }
 
     @CommandLine.Option(names = {"-h", "--help"}, hidden = true, usageHelp = true)
@@ -134,9 +163,16 @@ public class GrpcCmd implements BLauncherCmd {
     
     @Override
     public void execute() {
-        // Show help text
-        if (helpFlag || protoPath == null || protoPath.trim().isEmpty()) {
+        // Show help text with exit code 0 if help flag is present
+        if (helpFlag) {
             printLongDesc(new StringBuilder());
+            exit(EXIT_CODE_0);
+            return;
+        }
+        // Show help text with exit code 2 if no input provided
+        if (protoPath == null || protoPath.trim().isEmpty()) {
+            printLongDesc(new StringBuilder());
+            exit(EXIT_CODE_2);
             return;
         }
 
