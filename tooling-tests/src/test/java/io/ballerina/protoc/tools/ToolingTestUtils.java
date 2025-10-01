@@ -168,7 +168,7 @@ public class ToolingTestUtils {
     }
 
     public static void assertGeneratedSourcesWithNestedDirectories(String subDir, String outputDir, String importDir) {
-        Path outputDirPath = Paths.get(GENERATED_SOURCES_DIRECTORY, outputDir);;
+        Path outputDirPath = Paths.get(GENERATED_SOURCES_DIRECTORY, outputDir);
         Path protocOutputDirPath;
         if (outputDir.contains("tool_test_packaging")) {
             protocOutputDirPath = Paths.get(GENERATED_SOURCES_DIRECTORY);
