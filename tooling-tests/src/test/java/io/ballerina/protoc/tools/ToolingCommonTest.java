@@ -18,6 +18,7 @@
 
 package io.ballerina.protoc.tools;
 
+import io.ballerina.protoc.cli.GrpcCmd;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -57,11 +58,7 @@ public class ToolingCommonTest {
     public void testCommandWithoutArguments() {
         // Capture output using ByteArrayOutputStream with explicit encoding
         java.io.ByteArrayOutputStream outputStream = new java.io.ByteArrayOutputStream();
-        java.io.PrintStream printStream = new java.io.PrintStream(outputStream, true,
-                java.nio.charset.StandardCharsets.UTF_8);
-
-        // Create a GrpcCmd instance with the captured print stream
-        io.ballerina.protoc.cli.GrpcCmd grpcCmd = new io.ballerina.protoc.cli.GrpcCmd(printStream);
+        GrpcCmd grpcCmd = ToolingTestUtils.createGrpcCmd(outputStream);
 
         try {
             grpcCmd.execute();
@@ -78,9 +75,7 @@ public class ToolingCommonTest {
     @Test
     public void testCommandWithHelpFlag() {
         java.io.ByteArrayOutputStream outputStream = new java.io.ByteArrayOutputStream();
-        java.io.PrintStream printStream = new java.io.PrintStream(outputStream, true,
-                java.nio.charset.StandardCharsets.UTF_8);
-        io.ballerina.protoc.cli.GrpcCmd grpcCmd = new io.ballerina.protoc.cli.GrpcCmd(printStream);
+        GrpcCmd grpcCmd = ToolingTestUtils.createGrpcCmd(outputStream);
 
         try {
             java.lang.reflect.Field helpFlagField = grpcCmd.getClass().getDeclaredField("helpFlag");

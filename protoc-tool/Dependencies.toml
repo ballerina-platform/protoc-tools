@@ -5,13 +5,13 @@
 
 [ballerina]
 dependencies-toml-version = "2"
-distribution-version = "2201.12.0"
+distribution-version = "2201.13.0-20250924-081800-3dae8c03"
 
 [[package]]
 org = "ballerina"
-name = "tool_protoc"
+name = "tool.grpc"
 version = "1.0.0"
 modules = [
-	{org = "ballerina", packageName = "tool_protoc", moduleName = "tool_protoc"}
+	{org = "ballerina", packageName = "tool.grpc", moduleName = "tool.grpc"}
 ]
 

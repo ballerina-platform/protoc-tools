@@ -25,7 +25,7 @@ plugins {
 
 description = 'Ballerina - Protoc Tool'
 
-def packageName = "tool_protoc"
+def packageName = "tool.grpc"
 def packageOrg = "ballerina"
 def tomlVersion = stripBallerinaExtensionVersion("${project.version}")
 def ballerinaTomlFilePlaceHolder = new File("${project.rootDir}/build-config/resources/Ballerina.toml")
@@ -92,6 +92,10 @@ publishing {
             }
         }
     }
+}
+
+clean {
+    delete file("$projectDir/target")
 }
 
 updateTomlFiles.dependsOn copyStdlibs
