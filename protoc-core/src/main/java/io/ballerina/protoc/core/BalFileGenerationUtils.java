@@ -79,11 +79,13 @@ public class BalFileGenerationUtils {
                     " running the protoc executor. " + e.getMessage(), e);
         }
         if (process.exitValue() != 0) {
-            StringBuilder errMsg = new StringBuilder();
-            for (String line : output) {
-                errMsg.append(line).append(System.lineSeparator());
+            if (output.isEmpty()) {
+                throw new CodeGeneratorException("Proto compilation failed with exit code: " + process.exitValue());
+            } else {
+                String rawError = String.join(System.lineSeparator(), output);
+                String formattedError = formatProtoError(rawError);
+                throw new CodeGeneratorException(formattedError);
             }
-            throw new CodeGeneratorException("Process exited with the following output: \n" + errMsg);
         }
         return output;
     }
@@ -100,29 +102,17 @@ public class BalFileGenerationUtils {
     }
 
     public static void handleProcessExecutionErrors(Process process) throws CodeGeneratorException {
-        // Capture error stream before checking exit value to avoid "Stream closed" errors
-        StringBuilder errMsg = new StringBuilder();
-        try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(process.getErrorStream(),
-                StandardCharsets.UTF_8))) {
-            String err;
-            while ((err = bufferedReader.readLine()) != null) {
-                if (!errMsg.isEmpty()) {
-                    errMsg.append(System.lineSeparator());
-                }
-                errMsg.append(err);
-            }
-        } catch (IOException e) {
-            throw new CodeGeneratorException("Failed to read error output from protoc command. " + e.getMessage(), e);
-        }
-
-        // Now check exit value after reading error stream
         if (process.exitValue() != 0) {
-            if (errMsg.isEmpty()) {
-                throw new CodeGeneratorException("Proto compilation failed with exit code: " + process.exitValue());
-            } else {
-                // Format error message to be more user-friendly
-                String formattedError = formatProtoError(errMsg.toString());
-                throw new CodeGeneratorException(formattedError);
+            try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(process.getErrorStream(),
+                    StandardCharsets.UTF_8))) {
+                String err;
+                StringBuilder errMsg = new StringBuilder();
+                while ((err = bufferedReader.readLine()) != null) {
+                    errMsg.append(System.lineSeparator()).append(err);
+                }
+                throw new CodeGeneratorException(errMsg.toString());
+            } catch (IOException e) {
+                throw new CodeGeneratorException("Invalid command syntax. " + e.getMessage(), e);
             }
         }
     }
