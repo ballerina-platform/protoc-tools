@@ -136,12 +136,12 @@ public class BalFileGenerationUtils {
      * @return A formatted, user-friendly error message
      */
     private static String formatProtoError(String rawError) {
-    StringBuilder formatted = new StringBuilder();
-    formatted.append("Error: Failed to generate Ballerina files from proto definition.")
-        .append(System.lineSeparator());
-    formatted.append(System.lineSeparator());
-    formatted.append("Proto compilation failed with the following error:")
-        .append(System.lineSeparator());
+        StringBuilder formatted = new StringBuilder();
+        formatted.append("Error: Failed to generate Ballerina files from proto definition.")
+                .append(System.lineSeparator());
+        formatted.append(System.lineSeparator());
+        formatted.append("Proto compilation failed with the following error:")
+                .append(System.lineSeparator());
         formatted.append(rawError);
         formatted.append(System.lineSeparator());
         formatted.append(System.lineSeparator());
