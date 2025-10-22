@@ -69,9 +69,9 @@ import static io.ballerina.protoc.core.builder.balgen.BalGenConstants.GOOGLE_STA
 import static io.ballerina.protoc.core.builder.balgen.BalGenConstants.PACKAGE_SEPARATOR;
 import static io.ballerina.protoc.core.builder.syntaxtree.utils.ClientSampleSyntaxTreeUtils.generateSyntaxTreeForClientSample;
 import static io.ballerina.protoc.core.builder.syntaxtree.utils.CommonUtils.removeStandardImports;
-import static io.ballerina.protoc.core.utils.BalFileGenerationUtils.delete;
-import static io.ballerina.protoc.core.utils.BalFileGenerationUtils.handleProcessExecutionErrors;
-import static io.ballerina.protoc.core.utils.BalFileGenerationUtils.runProcess;
+import static io.ballerina.protoc.core.BalFileGenerationUtils.delete;
+import static io.ballerina.protoc.core.BalFileGenerationUtils.handleProcessExecutionErrors;
+import static io.ballerina.protoc.core.BalFileGenerationUtils.runProcess;
 
 /**
  * Class is responsible of generating the ballerina stub which is mapping proto definition.
