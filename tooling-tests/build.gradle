@@ -24,8 +24,7 @@ plugins {
 
 description = 'Ballerina - protoc-tools Tooling Test'
 
-def buildDir = "build";
-def ballerinaDist = "$project.buildDir/jballerina-tools-${ballerinaLangVersion}"
+def ballerinaDist = layout.buildDirectory.dir("jballerina-tools-${ballerinaLangVersion}").get().asFile
 def packageName = "protoc"
 
 dependencies {
@@ -76,7 +75,7 @@ task jBallerinaPack {
         configurations.jbalTools.resolvedConfiguration.resolvedArtifacts.each { artifact ->
             copy {
                 from project.zipTree(artifact.getFile())
-                into new File("${project.buildDir}")
+                into layout.buildDirectory.get().asFile
             }
         }
     }
@@ -89,7 +88,7 @@ task unpackStdLibs() {
         configurations.ballerinaStdLibs.resolvedConfiguration.resolvedArtifacts.each { artifact ->
             copy {
                 from project.zipTree(artifact.getFile())
-                into new File("${project.buildDir}/extracted-stdlibs/" + artifact.name + "-zip")
+                into layout.buildDirectory.dir("extracted-stdlibs/" + artifact.name + "-zip").get().asFile
             }
         }
     }
@@ -101,7 +100,7 @@ task copyStdlibs(type: Copy) {
 
     /* Standard Libraries */
     configurations.ballerinaStdLibs.resolvedConfiguration.resolvedArtifacts.each { artifact ->
-        def artifactExtractedPath = "${project.buildDir}/extracted-stdlibs/" + artifact.name + "-zip"
+        def artifactExtractedPath = layout.buildDirectory.dir("extracted-stdlibs/" + artifact.name + "-zip").get().asFile
         into("repo/bala") {
             from "${artifactExtractedPath}/bala/"
             duplicatesStrategy = DuplicatesStrategy.EXCLUDE
@@ -131,10 +130,10 @@ spotbugsTest {
     def SpotBugsEffort = classLoader.findLoadedClass("com.github.spotbugs.snom.Effort")
     effort = SpotBugsEffort.MAX
     reportLevel = SpotBugsConfidence.LOW
-    reportsDir = file("$project.buildDir/reports/spotbugs")
+    reportsDir = layout.buildDirectory.dir("reports/spotbugs").get().asFile
     reports {
-        html.enabled true
-        text.enabled = true
+        html.required = true
+        text.required = true
     }
     def excludeFile = file("${rootDir}/spotbugs-exclude.xml")
     if(excludeFile.exists()) {
@@ -150,10 +149,10 @@ test {
     dependsOn(copyStdlibs)
     systemProperty "ballerina.home", ballerinaDist
     systemProperty "ballerina.offline.flag", "true"
-    binaryResultsDirectory = file("$buildDir/test-results/binary")
+    binaryResultsDirectory = layout.buildDirectory.dir("test-results/binary").get().asFile
     useTestNG() {
         suites 'src/test/resources/testng.xml'
-        outputDirectory = file("$buildDir/test-output")
+        outputDirectory = layout.buildDirectory.dir("test-output").get().asFile
         useDefaultListeners = true
     }
     testLogging.showStandardStreams = true
@@ -172,7 +171,7 @@ test {
 }
 
 clean {
-    delete file("$buildDir/generated-sources")
+    delete layout.buildDirectory.dir("generated-sources").get().asFile
 }
 
 jacoco {

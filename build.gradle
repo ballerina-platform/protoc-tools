@@ -103,6 +103,14 @@ subprojects {
         ballerinaStdLibs "io.ballerina.stdlib:observe-ballerina:${observeVersion}"
         ballerinaStdLibs "io.ballerina:observe-ballerina:${observeInternalVersion}"
     }
+
+    plugins.withId('java') {
+        java {
+            toolchain {
+                languageVersion = JavaLanguageVersion.of(25)
+            }
+        }
+    }
 }
 
 def moduleVersion = project.version.replace("-SNAPSHOT", "")
@@ -144,9 +152,9 @@ task codeCoverageReport(type: JacocoReport) {
         xml.required = true
         html.required = true
         csv.required = true
-        xml.destination(new File("${buildDir}/reports/jacoco/test/jacocoTestReport.xml"))
-        html.destination(new File("${buildDir}/reports/jacoco/test/jacocoTestReport.html"))
-        csv.destination(new File("${buildDir}/reports/jacoco/test/jacocoTestReport.csv"))
+        xml.outputLocation = layout.buildDirectory.file("reports/jacoco/test/jacocoTestReport.xml")
+        html.outputLocation = layout.buildDirectory.dir("reports/jacoco/test/jacocoTestReport.html")
+        csv.outputLocation = layout.buildDirectory.file("reports/jacoco/test/jacocoTestReport.csv")
     }
 
     onlyIf = {
@@ -154,6 +162,6 @@ task codeCoverageReport(type: JacocoReport) {
     }
 }
 
-task build {
+tasks.named('build') {
     dependsOn(":${packageName}-tool:build")
 }
