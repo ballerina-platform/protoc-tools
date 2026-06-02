@@ -135,7 +135,7 @@ spotbugsTest {
         html.required = true
         text.required = true
     }
-    def excludeFile = file("${rootDir}/spotbugs-exclude.xml")
+    def excludeFile = file("${rootDir}/build-config/spotbugs-exclude.xml")
     if(excludeFile.exists()) {
         excludeFilter = excludeFile
     }
