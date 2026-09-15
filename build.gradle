@@ -19,7 +19,7 @@
 plugins {
     id 'jacoco'
     id "com.github.spotbugs"
-    id "com.github.johnrengelman.shadow"
+    id "com.gradleup.shadow"
     id "de.undercouch.download"
     id "net.researchgate.release"
 }
@@ -144,9 +144,9 @@ task codeCoverageReport(type: JacocoReport) {
         xml.required = true
         html.required = true
         csv.required = true
-        xml.destination(new File("${buildDir}/reports/jacoco/test/jacocoTestReport.xml"))
-        html.destination(new File("${buildDir}/reports/jacoco/test/jacocoTestReport.html"))
-        csv.destination(new File("${buildDir}/reports/jacoco/test/jacocoTestReport.csv"))
+        xml.outputLocation.set(new File("${buildDir}/reports/jacoco/test/jacocoTestReport.xml"))
+        html.outputLocation.set(new File("${buildDir}/reports/jacoco/test/jacocoTestReport.html"))
+        csv.outputLocation.set(new File("${buildDir}/reports/jacoco/test/jacocoTestReport.csv"))
     }
 
     onlyIf = {
@@ -154,6 +154,14 @@ task codeCoverageReport(type: JacocoReport) {
     }
 }
 
-task build {
-    dependsOn(":${packageName}-tool:build")
+if (tasks.names.contains('build')) {
+    tasks.named('build') {
+        dependsOn(":${packageName}-tool:build")
+
+    }
+} else {
+    tasks.register('build') {
+        dependsOn(":${packageName}-tool:build")
+
+    }
 }

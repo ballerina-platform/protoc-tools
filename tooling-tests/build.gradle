@@ -131,7 +131,7 @@ spotbugsTest {
     def SpotBugsEffort = classLoader.findLoadedClass("com.github.spotbugs.snom.Effort")
     effort = SpotBugsEffort.MAX
     reportLevel = SpotBugsConfidence.LOW
-    reportsDir = file("$project.buildDir/reports/spotbugs")
+    reportsDir = layout.buildDirectory.dir("reports/spotbugs")
     reports {
         html.enabled true
         text.enabled = true
@@ -150,10 +150,10 @@ test {
     dependsOn(copyStdlibs)
     systemProperty "ballerina.home", ballerinaDist
     systemProperty "ballerina.offline.flag", "true"
-    binaryResultsDirectory = file("$buildDir/test-results/binary")
+    binaryResultsDirectory = layout.buildDirectory.dir("test-results/binary").get().asFile
     useTestNG() {
         suites 'src/test/resources/testng.xml'
-        outputDirectory = file("$buildDir/test-output")
+        outputDirectory = layout.buildDirectory.dir("test-output").get().asFile
         useDefaultListeners = true
     }
     testLogging.showStandardStreams = true
@@ -172,7 +172,7 @@ test {
 }
 
 clean {
-    delete file("$buildDir/generated-sources")
+    delete layout.buildDirectory.dir("generated-sources").get().asFile
 }
 
 jacoco {
