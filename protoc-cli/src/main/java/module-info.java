@@ -21,5 +21,5 @@ module io.ballerina.protoc {
     requires info.picocli;
     requires io.ballerina.protoc.core;
     requires org.slf4j;
-    requires protobuf.java;
+    requires com.google.protobuf;
 }

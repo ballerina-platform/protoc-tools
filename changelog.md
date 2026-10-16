@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - [Fix the issue when there is Map type in the proto definition](ballerina-platform/ballerina-library#8034)
 
+### Changed
+- [Upgrade protobuf-java to 4.36.2 to remove `sun.misc.Unsafe` warnings on JDK 24+](https://github.com/ballerina-platform/ballerina-library/issues/9311)
+
 ### Added
 - [Expose proto tool Java APIs to generate gRPC service from proto file](https://github.com/ballerina-platform/ballerina-library/issues/7554)
 - [Decouple Protoc tool from the Distribution](https://github.com/ballerina-platform/ballerina-library/issues/7939)
